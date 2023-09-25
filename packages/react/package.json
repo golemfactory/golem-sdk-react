@@ -1,0 +1,33 @@
+{
+  "name": "@golem-sdk/react",
+  "version": "0.1.0",
+  "author": "GolemFactory <contact@golem.network>",
+  "license": "GPL-3.0",
+  "main": "index.ts",
+  "description": "React hooks for working with the Golem Network",
+  "dependencies": {
+    "@golem-sdk/golem-js": "^0.11.1",
+    "swr": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/golemfactory/golem-sdk-react.git"
+  },
+  "keywords": [
+    "golem",
+    "network",
+    "sdk",
+    "react",
+    "hooks"
+  ],
+  "bugs": {
+    "url": "https://github.com/golemfactory/golem-sdk-react/issues"
+  },
+  "homepage": "https://github.com/golemfactory/golem-sdk-react#readme"
+}

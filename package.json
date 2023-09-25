@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "example:vite": "cd examples/react-with-vite && npm run dev"
+  },
+  "workspaces": [
+    "examples/react-with-vite",
+    "packages/react"
+  ]
+}
