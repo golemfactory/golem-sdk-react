@@ -1,44 +1,44 @@
 import { createContext, PropsWithChildren, createElement } from "react";
 import { Yagna } from "@golem-sdk/golem-js";
 
-interface GolemContext {
+interface YagnaContext {
   yagnaClient: Yagna;
   yagnaOptions: {
     apiKey: string;
     basePath: string;
   };
 }
-export const golemContext = createContext<GolemContext | undefined>(undefined);
+export const yagnaContext = createContext<YagnaContext | undefined>(undefined);
 
-export type GolemProviderConfig = {
+export type YagnaProviderConfig = {
   yagnaUrl?: string;
   yagnaAppKey: string;
 };
 
 /**
- * Provides context for all Golem hooks.
+ * Provides context for all hooks that interact with Yagna.
  * @param config - The configuration object for the provider.
  * @param config.yagnaAppKey - The API key for the Yagna client. This is required.
  * @param config.yagnaUrl - The base URL for the Yagna client. This is optional and defaults to "http://127.0.0.1:7465".
  * @example
  * ```
- * <GolemProvider config={{ yagnaAppKey: "myApiKey", yagnaUrl: "http://localhost:7465" }}>
+ * <YagnaProvider config={{ yagnaAppKey: "myApiKey", yagnaUrl: "http://localhost:7465" }}>
  *   <App />
- * </GolemProvider>
+ * </YagnaProvider>
  * ```
  */
-export function GolemProvider({
+export function YagnaProvider({
   children,
   config,
 }: PropsWithChildren<{
-  config: GolemProviderConfig;
+  config: YagnaProviderConfig;
 }>) {
   const yagnaClient = new Yagna({
     apiKey: config.yagnaAppKey,
     basePath: config.yagnaUrl,
   });
 
-  return createElement(golemContext.Provider, {
+  return createElement(yagnaContext.Provider, {
     children,
     value: {
       yagnaClient,
