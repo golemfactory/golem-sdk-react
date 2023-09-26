@@ -64,7 +64,7 @@ export function useDebitNotes({
     {
       keepPreviousData: true,
       ...swrConfig,
-    }
+    },
   );
   return {
     debitNotes: data,

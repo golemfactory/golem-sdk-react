@@ -59,7 +59,7 @@ export function useInvoices({
     {
       keepPreviousData: true,
       ...swrConfig,
-    }
+    },
   );
   return {
     invoices: data,

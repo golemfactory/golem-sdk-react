@@ -60,7 +60,7 @@ export function useTask(executor: TaskExecutor) {
         setIsRunning(false);
       }
     },
-    [executor, isRunning]
+    [executor, isRunning],
   );
 
   return {
