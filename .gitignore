@@ -21,5 +21,6 @@ node_modules/
 # Ignore .DS_Store files
 .DS_Store
 
-# Ignore .vscode directory
+# Ignore IDE settings
 .vscode/
+.idea/
