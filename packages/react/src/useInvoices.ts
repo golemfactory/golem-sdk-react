@@ -47,9 +47,9 @@ export function useInvoices({
   limit?: number;
   swrConfig?: SWRConfiguration;
 } = {}) {
-  const { yagnaClient } = useConfig();
+  const { yagnaClient, swrKey } = useConfig();
   const { data, isLoading, isValidating, error, mutate } = useSwr(
-    ["invoices", after, limit],
+    [swrKey, "invoices", after, limit],
     async () => {
       return yagnaClient
         .getApi()

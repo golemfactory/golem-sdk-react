@@ -26,10 +26,10 @@ import useSwr from "swr";
  * ```
  */
 export function useYagna() {
-  const { yagnaClient } = useConfig();
+  const { yagnaClient, swrKey } = useConfig();
 
   const { isLoading, error, mutate } = useSwr(
-    "yagna",
+    [swrKey, "yagna-connection-status"],
     async () => {
       return yagnaClient.getApi().identity.getIdentity();
     },
