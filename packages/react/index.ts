@@ -5,3 +5,4 @@ export { useTask, type Worker } from "./src/useTask";
 export { useInvoices, InvoiceStatus } from "./src/useInvoices";
 export { useDebitNotes } from "./src/useDebitNotes";
 export { useHandleInvoice } from "./src/useHandleInvoice";
+export { useHandleDebitNote } from "./src/useHandleDebitNote";
