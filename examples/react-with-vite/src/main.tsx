@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { YagnaProvider } from "@golem-sdk/react";
 import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 if (!import.meta.env.VITE_YAGNA_APP_KEY) {
   throw new Error(
@@ -18,6 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       }}
     >
       <App />
+      <ToastContainer hideProgressBar position="top-center" />
     </YagnaProvider>
   </React.StrictMode>,
 );
