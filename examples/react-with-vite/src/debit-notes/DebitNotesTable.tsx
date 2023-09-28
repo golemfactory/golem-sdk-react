@@ -45,6 +45,7 @@ export default function DebitNotesTable() {
                     amountDue={new Decimal(debitNote.totalAmountDue)}
                     issuedAt={new Date(debitNote.timestamp)}
                     status={debitNote.status}
+                    onAction={() => refetch()}
                   />
                 ))}
             </tbody>

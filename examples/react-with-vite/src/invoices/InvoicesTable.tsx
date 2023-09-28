@@ -7,7 +7,7 @@ export default function InvoicesTable() {
   const [after, setAfter] = useState<string | undefined>();
   const prevAfter = useRef<string[]>([]);
 
-  const { invoices, isLoading, error } = useInvoices({
+  const { invoices, isLoading, error, refetch } = useInvoices({
     after,
     limit: 10,
   });
@@ -41,6 +41,9 @@ export default function InvoicesTable() {
                     price={new Decimal(invoice.amount)}
                     issuedAt={new Date(invoice.timestamp)}
                     status={invoice.status}
+                    onAction={() => {
+                      refetch();
+                    }}
                   />
                 ))}
             </tbody>
