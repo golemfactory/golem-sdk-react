@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "example:vite": "cd examples/react-with-vite && npm run dev",
+    "example:vite": "npm run dev --workspace=react-with-vite",
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx . --fix"
   },
