@@ -26,10 +26,10 @@ import useSwr from "swr";
  * ```
  */
 export function useYagna() {
-  const { yagnaClient } = useConfig();
+  const { yagnaClient, swrKey } = useConfig();
 
   const { isLoading, error, mutate } = useSwr(
-    "yagna",
+    [swrKey, "yagna-connection-status"],
     async () => {
       return yagnaClient.getApi().identity.getIdentity();
     },
@@ -37,7 +37,7 @@ export function useYagna() {
       refreshInterval: 3000, // ping yagna every 3 seconds to check if it's still connected
       revalidateOnFocus: false,
       loadingTimeout: 3000, // if yagna doesn't respond within 3 seconds, consider it disconnected
-    }
+    },
   );
 
   return {

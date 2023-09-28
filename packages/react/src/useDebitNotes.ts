@@ -47,9 +47,9 @@ export function useDebitNotes({
   limit?: number;
   swrConfig?: SWRConfiguration;
 } = {}) {
-  const { yagnaClient } = useConfig();
+  const { yagnaClient, swrKey } = useConfig();
   const { data, isLoading, isValidating, error, mutate } = useSWR(
-    ["debitNotes", limit],
+    [swrKey, "debit-notes", limit],
     async () => {
       return (
         yagnaClient
@@ -64,7 +64,7 @@ export function useDebitNotes({
     {
       keepPreviousData: true,
       ...swrConfig,
-    }
+    },
   );
   return {
     debitNotes: data,

@@ -31,7 +31,7 @@ interface ExtraOptions {
  */
 export function useExecutor(
   options: ExecutorOptions,
-  { addBeforeUnloadHandler = true }: ExtraOptions = {}
+  { addBeforeUnloadHandler = true }: ExtraOptions = {},
 ) {
   const [executor, setExecutor] = useState<TaskExecutor | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);

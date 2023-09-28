@@ -24,7 +24,12 @@
     "network",
     "sdk",
     "react",
-    "hooks"
+    "hooks",
+    "distributed",
+    "computing",
+    "internet",
+    "computer",
+    "marketplace"
   ],
   "bugs": {
     "url": "https://github.com/golemfactory/golem-sdk-react/issues"

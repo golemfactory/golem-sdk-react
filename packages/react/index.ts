@@ -1,4 +1,4 @@
-export { GolemProvider } from "./src/provider";
+export { YagnaProvider } from "./src/provider";
 export { useYagna } from "./src/useYagna";
 export { useExecutor, TaskExecutor } from "./src/useExecutor";
 export { useTask, type Worker } from "./src/useTask";
