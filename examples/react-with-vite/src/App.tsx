@@ -1,6 +1,6 @@
 import Navbar from "./header/Navbar";
 import React, { useState } from "react";
-import RunTaskCard from "./run-task/RunTasksCard";
+import RunTaskCard from "./run-task/RunTaskCard";
 import InvoicesTable from "./invoices/InvoicesTable";
 import DebitNotesTable from "./debit-notes/DebitNotesTable";
 import { useYagna } from "@golem-sdk/react";
