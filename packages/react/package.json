@@ -3,8 +3,16 @@
   "version": "0.1.0",
   "author": "GolemFactory <contact@golem.network>",
   "license": "GPL-3.0",
-  "main": "index.ts",
   "description": "React hooks for working with the Golem Network",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
+    }
+  },
   "dependencies": {
     "@golem-sdk/golem-js": "^0.11.1",
     "swr": "^2.2.2"
@@ -13,7 +21,12 @@
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "rimraf": "^5.0.5"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0  || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0  || ^17.0.0 || ^18.0.0"
   },
   "repository": {
     "type": "git",
@@ -34,5 +47,14 @@
   "bugs": {
     "url": "https://github.com/golemfactory/golem-sdk-react/issues"
   },
-  "homepage": "https://github.com/golemfactory/golem-sdk-react#readme"
+  "homepage": "https://github.com/golemfactory/golem-sdk-react#readme",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.build.json --module commonjs --outDir dist/cjs --target es5",
+    "build:esm": "tsc -p tsconfig.build.json --module esNext --outDir dist/esm --target es6"
+  }
 }

@@ -24,3 +24,6 @@ node_modules/
 # Ignore IDE settings
 .vscode/
 .idea/
+
+# Ignore build directory
+dist/
