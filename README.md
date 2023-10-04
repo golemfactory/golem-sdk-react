@@ -20,7 +20,7 @@ npm run build
 Then create a `.env` file in the `examples/react-with-vite` directory with the following content:
 
 ```
-YAGNA_APP_KEY=<your-yagna-app-key>
+VITE_YAGNA_APPKEY=<your-yagna-app-key>
 ```
 
 Finally, run the demo application:

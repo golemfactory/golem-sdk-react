@@ -6,9 +6,9 @@ import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
-if (!import.meta.env.VITE_YAGNA_APP_KEY) {
+if (!import.meta.env.VITE_YAGNA_APPKEY) {
   throw new Error(
-    "VITE_YAGNA_APP_KEY env variable not set. Please specify it in .env file.",
+    "VITE_YAGNA_APPKEY env variable not set. Please specify it in .env file.",
   );
 }
 
@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <YagnaProvider
       config={{
-        yagnaAppKey: import.meta.env.VITE_YAGNA_APP_KEY,
+        yagnaAppKey: import.meta.env.VITE_YAGNA_APPKEY,
       }}
     >
       <App />
