@@ -2,6 +2,7 @@ import { ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
 import { useConfig } from "./useConfig";
 import { useState, useCallback } from "react";
 export { TaskExecutor };
+export type { ExecutorOptions };
 
 function beforeUnloadHandler(e: BeforeUnloadEvent) {
   e.preventDefault();

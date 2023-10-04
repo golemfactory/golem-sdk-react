@@ -1,7 +1,24 @@
-import { useExecutor } from "@golem-sdk/react";
+import { ExecutorOptions, useExecutor } from "@golem-sdk/react";
 import ImageClassification from "./ImageClassification";
+import { useState } from "react";
+import ExecutorOptionsForm from "./ExecutorConfigForm";
 
 export default function RunTaskCard() {
+  const [executorOptions, setExecutorOptions] = useState<ExecutorOptions>({
+    package: "golem/example-image-classifier:latest",
+    enableLogging: false,
+    budget: 1,
+    subnetTag: "public",
+    payment: {
+      driver: "erc20",
+      network: "goerli",
+    },
+    minCpuCores: 1,
+    minMemGib: 1,
+    minCpuThreads: 1,
+    minStorageGib: 1,
+  });
+
   const {
     executor,
     initialize,
@@ -10,10 +27,7 @@ export default function RunTaskCard() {
     isInitializing,
     terminate,
     isTerminating,
-  } = useExecutor({
-    package: "117430deb26f19aeea5da164ea33bdb3e7c3e3fd840403882e0c2920",
-    enableLogging: false,
-  });
+  } = useExecutor(executorOptions);
 
   return (
     <div className="card bg-base-100 shadow-xl">
@@ -21,7 +35,12 @@ export default function RunTaskCard() {
         {!isInitialized && (
           <>
             <h2 className="card-title">Let's initialize a new Task Executor</h2>
-            <div className="card-actions justify-center pt-4">
+            <ExecutorOptionsForm
+              options={executorOptions}
+              setOptions={setExecutorOptions}
+              disabled={isInitializing}
+            />
+            <div className="card-actions justify-end pt-4">
               <button
                 onClick={() => {
                   initialize();
