@@ -5,7 +5,7 @@ import ExecutorOptionsForm from "./ExecutorConfigForm";
 
 export default function RunTaskCard() {
   const [executorOptions, setExecutorOptions] = useState<ExecutorOptions>({
-    package: "117430deb26f19aeea5da164ea33bdb3e7c3e3fd840403882e0c2920",
+    package: "golem/example-image-classifier:latest",
     enableLogging: false,
     budget: 1,
     subnetTag: "public",
