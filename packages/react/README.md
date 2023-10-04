@@ -35,12 +35,13 @@ yagna service run --api-allow-origin='http://localhost:3000'
 
 ## Demo application
 
-Sometimes it's easier to learn by example. That's why we've created a demo application that uses all the hooks from the SDK. You can find it in the `examples/react-with-vite` directory. To run it locally, first clone the repository and install the dependencies:
+Sometimes it's easier to learn by example. That's why we've created a demo application that uses all the hooks from the SDK. You can find it in the `examples/react-with-vite` directory. To run it locally, first clone the repository, install it's dependencies and build the react package:
 
 ```
 git clone https://github.com/golemfactory/golem-sdk-react.git
 cd golem-sdk-react/
 npm install
+npm run build
 ```
 
 Then create a `.env` file in the `examples/react-with-vite` directory with the following content:

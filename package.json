@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "example:vite": "npm run dev --workspace=react-with-vite",
+    "build": "npm run build --workspace=@golem-sdk/react",
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx . --fix"
   },
