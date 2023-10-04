@@ -1,7 +1,7 @@
-import { createContext, PropsWithChildren, createElement } from "react";
+import React, { createContext, PropsWithChildren } from "react";
 import { Yagna } from "@golem-sdk/golem-js";
 
-interface YagnaContext {
+export interface YagnaContext {
   yagnaClient: Yagna;
   yagnaOptions: {
     apiKey: string;
@@ -41,18 +41,18 @@ export function YagnaProvider({
     basePath: config.yagnaUrl,
   });
 
-  return createElement(
-    yagnaContext.Provider,
-    {
-      value: {
+  return (
+    <yagnaContext.Provider
+      value={{
         yagnaClient,
         yagnaOptions: {
           apiKey: config.yagnaAppKey,
           basePath: config.yagnaUrl || "http://127.0.0.1:7465",
         },
         swrKey: config.swrKey || "golem-sdk",
-      },
-    },
-    children,
+      }}
+    >
+      {children}
+    </yagnaContext.Provider>
   );
 }
