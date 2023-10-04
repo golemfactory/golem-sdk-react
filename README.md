@@ -1,134 +1,234 @@
-![Logo of the project](https://raw.githubusercontent.com/jehna/readme-best-practices/master/sample-logo.png)
+# Golem React SDK
 
-# Name of the project
-> Additional information or tagline
+A collection of React hooks for interacting with the Golem Network.
 
-A brief description of your project, what it is used for and how does life get
-awesome when someone starts to use it.
+## Getting started
 
-## Installing / Getting started
+To add the SDK to your existing react project just install it using your favorite package manager:
 
-A quick introduction of the minimal setup you need to get a hello world up &
-running.
-
-```shell
-packagemanager install awesome-project
-awesome-project start
-awesome-project "Do something!"  # prints "Nah."
+```
+npm install @golem-sdk/react
+yarn add @golem-sdk/react
+pnpm add @golem-sdk/react
+bun add @golem-sdk/react
 ```
 
-Here you should say what actually happens when you execute the code above.
+Then make sure to wrap your app with the `YagnaProvider` component:
+
+```jsx
+<YagnaProvider
+  config={{ yagnaAppKey: "myApiKey", yagnaUrl: "http://localhost:7465" }}
+>
+  <App />
+</YagnaProvider>
+```
 
 ### Initial Configuration
 
-Some projects require initial configuration (e.g. access tokens or keys, `npm i`).
-This is the section where you would document those requirements.
+For the SDK to work properly you need to have a running Yagna instance on your local machine. Please follow the [Yagna installation guide](https://docs.golem.network/docs/creators/javascript/examples/tools/yagna-installation-for-requestors) to install and configure Yagna.
 
-## Developing
-
-Here's a brief intro about what a developer must do in order to start developing
-the project further:
+Yagna blocks all requests from external origins by default. To allow the SDK to communicate with it you need start Yagna with `--api-allow-origin='<your-domain>'` flag. For example:
 
 ```shell
-git clone https://github.com/your/awesome-project.git
-cd awesome-project/
-packagemanager install
+yagna service run --api-allow-origin='http://localhost:3000'
 ```
 
-And state what happens step-by-step.
+## Demo application
 
-### Building
+Sometimes it's easier to learn by example. That's why we've created a demo application that uses all the hooks from the SDK. You can find it in the `examples/react-with-vite` directory. To run it locally, first clone the repository and install the dependencies:
 
-If your project needs some additional steps for the developer to build the
-project after some code changes, state them here:
-
-```shell
-./configure
-make
-make install
+```
+git clone https://github.com/golemfactory/golem-sdk-react.git
+cd golem-sdk-react/
+npm install
 ```
 
-Here again you should state what actually happens when the code above gets
-executed.
+Then create a `.env` file in the `examples/react-with-vite` directory with the following content:
 
-### Deploying / Publishing
-
-In case there's some step you have to take that publishes this project to a
-server, this is the right time to state it.
-
-```shell
-packagemanager deploy awesome-project -s server.com -u username -p password
+```
+YAGNA_APP_KEY=<your-yagna-app-key>
 ```
 
-And again you'd need to tell what the previous code actually does.
+Finally, run the demo application:
+
+```
+npm run example:vite
+```
 
 ## Features
 
-What's all the bells and whistles this project can perform?
-* What's the main functionality
-* You can also do another thing
-* If you get really randy, you can even do this
+### `useYagna` - check if you're connected to Yagna
 
-## Configuration
-
-Here you should write what are all of the configurations a user can enter when
-using the project.
-
-#### Argument 1
-Type: `String`  
-Default: `'default value'`
-
-State what an argument does and how you can use it. If needed, you can provide
-an example below.
-
-Example:
-```bash
-awesome-project "Some other value"  # Prints "You're nailing this readme!"
+```jsx
+function MyComponent() {
+  const { isConnected, reconnect, isLoading, error } = useYagna();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <div>
+      <div>Yagna is {isConnected ? "connected" : "disconnected"}</div>
+      <button onClick={reconnect} disabled={!isConnected}>
+        Reconnect
+      </button>
+      {error && <div>Error: {error.toString()}</div>}
+    </div>
+  );
+}
 ```
 
-#### Argument 2
-Type: `Number|Boolean`  
-Default: 100
+### `useExecutor` + `useTask` - run a task on the Golem Network
 
-Copy-paste as many of these as you need.
+```jsx
+function MyTask({ executor }) {
+  const { isRunning, isError, result, run } = useTask(executor);
+  const onClick = () =>
+    run(async (ctx) => {
+      return (await ctx.run("echo", ["Hello world!"])).stdout;
+    });
+  return (
+    <div>
+      <button onClick={onClick} disabled={isRunning}>
+        Run task
+      </button>
+      {isRunning && <div>Task is running...</div>}
+      {isError && <div>Task failed</div>}
+      {result && <div>Task result: {result}</div>}
+    </div>
+  );
+}
 
-## Contributing
+function MyComponent() {
+  const {
+    executor,
+    initialize,
+    isInitialized,
+    isInitializing,
+    terminate,
+    error,
+  } = useExecutor();
+  if (isInitializing) {
+    return <div>Initializing executor...</div>;
+  }
+  if (error) {
+    return <div>Error: {error.toString()}</div>;
+  }
+  if (!isInitialized) {
+    return (
+      <div>
+        <button onClick={initialize}>Initialize executor</button>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <MyTask executor={executor} />
+      <button onClick={terminate}>Terminate executor</button>
+    </div>
+  );
+}
+```
 
-When you publish something open source, one of the greatest motivations is that
-anyone can just jump in and start contributing to your project.
+### `useInvoices` + `useHandleInvoice` - list and handle invoices
 
-These paragraphs are meant to welcome those kind souls to feel that they are
-needed. You should state something like:
+```jsx
+function Invoice({ invoiceId }) {
+  const { acceptInvoice } = useHandleInvoice(invoiceId);
 
-"If you'd like to contribute, please fork the repository and use a feature
-branch. Pull requests are warmly welcome."
+  return (
+    <li key={invoice.invoiceId}>
+      {invoice.invoiceId} - {invoice.status}
+      <button onClick={acceptInvoice} disabled={invoice.status !== "RECEIVED"}>
+        Accept
+      </button>
+    </li>
+  );
+}
 
-If there's anything else the developer needs to know (e.g. the code style
-guide), you should link it here. If there's a lot of things to take into
-consideration, it is common to separate this section to its own file called
-`CONTRIBUTING.md` (or similar). If so, you should say that it exists here.
+function MyComponent() {
+  const { invoices, isLoading, error, refetch } = useInvoices();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Error: {error.toString()}</div>;
+  }
+  return (
+    <div>
+      <ul>
+        {invoices.map((invoice) => (
+          <Invoice key={invoice.invoiceId} invoiceId={invoice.invoiceId} />
+        ))}
+      </ul>
+      <button onClick={refetch}> Refresh </button>
+    </div>
+  );
+}
+```
+
+### `useDebitNotes` + `useHandleDebitNote` - list and handle debit notes
+
+```jsx
+function DebitNote({ debitNoteId }) {
+  const { acceptDebitNote } = useHandleDebitNote();
+
+  return (
+    <li key={debitNoteId}>
+      {debitNoteId} - {debitNote.status}
+      <button
+        onClick={acceptDebitNote}
+        disabled={debitNote.status !== "RECEIVED"}
+      >
+        Accept
+      </button>
+    </li>
+  );
+}
+
+function MyComponent() {
+  const { debitNotes, isLoading, error, refetch } = useDebitNotes();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Error: {error.toString()}</div>;
+  }
+  return (
+    <div>
+      <ul>
+        {debitNotes.map((debitNote) => (
+          <DebitNote
+            key={debitNote.debitNoteId}
+            debitNoteId={debitNote.debitNoteId}
+          />
+        ))}
+      </ul>
+      <button onClick={refetch}> Refresh </button>
+    </div>
+  );
+}
+```
+
+## Developing
+
+If you want to contribute to the SDK, you can clone the repository and install the dependencies:
+
+```shell
+git clone https://github.com/golemfactory/golem-sdk-react.git
+cd golem-sdk-react/
+npm install
+```
 
 ## Links
 
-Even though this information can be found inside the project on machine-readable
-format like in a .json file, it's good to include a summary of most useful
-links to humans using your project. You can include links like:
-
-- Project homepage: https://your.github.com/awesome-project/
-- Repository: https://github.com/your/awesome-project/
-- Issue tracker: https://github.com/your/awesome-project/issues
+- Golem documentation: https://docs.golem.network/
+- Repository: https://github.com/golemfactory/golem-sdk-react/
+- Issue tracker: https://github.com/golemfactory/golem-sdk-react/issues
   - In case of sensitive bugs like security vulnerabilities, please contact
-    my@email.com directly instead of using issue tracker. We value your effort
-    to improve the security and privacy of this project!
+    contact@golem.network directly instead of using issue tracker. We value your effort to improve the security and privacy of this project!
 - Related projects:
-  - Your other project: https://github.com/your/other-project/
-  - Someone else's project: https://github.com/someones/awesome-project/
-
+  - Golem JavaScript API: https://github.com/golemfactory/golem-js/
 
 ## Licensing
 
-One really important part: Give your project a proper license. Here you should
-state what the license is and how to find the text version of the license.
-Something like:
-
-"The code in this project is licensed under MIT license."
+The code in this project is licensed under GPL-3.0 license.
