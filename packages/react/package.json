@@ -4,6 +4,9 @@
   "author": "GolemFactory <contact@golem.network>",
   "license": "GPL-3.0",
   "description": "React hooks for working with the Golem Network",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/esm/index.d.ts",
