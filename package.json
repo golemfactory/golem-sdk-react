@@ -6,11 +6,12 @@
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx . --fix",
     "format": "prettier -w .",
-    "format:check": "prettier -c ."
+    "format:check": "prettier -c .",
+    "prepare": "husky install"
   },
   "workspaces": [
-    "examples/react-with-vite",
-    "packages/react"
+    "examples/*",
+    "packages/*"
   ],
   "devDependencies": {
     "@commitlint/cli": "^18.2.0",
