@@ -4,15 +4,18 @@
     "example:vite": "npm run dev --workspace=react-with-vite",
     "build": "npm run build --workspace=@golem-sdk/react",
     "lint": "eslint --ext .ts,.tsx .",
-    "lint:fix": "eslint --ext .ts,.tsx . --fix"
+    "lint:fix": "eslint --ext .ts,.tsx . --fix",
+    "format": "prettier -w .",
+    "format:check": "prettier -c .",
+    "prepare": "husky install"
   },
   "workspaces": [
-    "examples/react-with-vite",
-    "packages/react"
+    "examples/*",
+    "packages/*"
   ],
   "devDependencies": {
-    "@commitlint/cli": "^17.7.2",
-    "@commitlint/config-conventional": "^17.7.0",
+    "@commitlint/cli": "^18.2.0",
+    "@commitlint/config-conventional": "^18.1.0",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "eslint": "^8.50.0",
