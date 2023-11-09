@@ -37,7 +37,7 @@ export function useExecutor(
   const [executor, setExecutor] = useState<TaskExecutor | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [isTerminating, setIsTerminating] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<any>(null);
   const config = useConfig();
   const isInitialized = !!executor;
 

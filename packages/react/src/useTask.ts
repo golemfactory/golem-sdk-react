@@ -17,7 +17,7 @@ export type { Worker };
  * - `isError`: A boolean indicating whether an error occurred while running the task.
  * - `result`: The result of the task, if it has finished running.
  * - `run`: A function that can be called to run the task.
- * - `error`: The error that has occurred - undefined otherwise.
+ * - `error`: The error that has occurred - null otherwise.
  *
  * @example
  * ```jsx
@@ -44,7 +44,7 @@ export function useTask<T = any>(executor: TaskExecutor) {
   const [isRunning, setIsRunning] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
   const [result, setResult] = React.useState<T>();
-  const [error, setError] = React.useState<any>();
+  const [error, setError] = React.useState<any>(null);
 
   const run = React.useCallback(
     async (worker: Worker<any, T>) => {
