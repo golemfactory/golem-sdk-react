@@ -9,6 +9,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended"
   ],
+  "ignorePatterns": ["dist"],
   "overrides": [
     {
       "env": {
