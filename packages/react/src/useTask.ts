@@ -2,7 +2,9 @@ import { TaskExecutor } from "@golem-sdk/golem-js";
 import React from "react";
 
 // TODO: expose worker type in @golem-sdk/golem-js
-type Worker = Parameters<TaskExecutor["run"]>[0];
+// Import for use in the hook
+import { Worker } from "@golem-sdk/golem-js/dist/task";
+// Export for use by SDK users
 export type { Worker };
 
 /**
@@ -15,6 +17,7 @@ export type { Worker };
  * - `isError`: A boolean indicating whether an error occurred while running the task.
  * - `result`: The result of the task, if it has finished running.
  * - `run`: A function that can be called to run the task.
+ * - `error`: The error that has occurred - undefined otherwise.
  *
  * @example
  * ```jsx
@@ -37,24 +40,26 @@ export type { Worker };
  * }
  * ```
  */
-export function useTask(executor: TaskExecutor) {
+export function useTask<T = any>(executor: TaskExecutor) {
   const [isRunning, setIsRunning] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
-  const [result, setResult] = React.useState<unknown>();
+  const [result, setResult] = React.useState<T>();
+  const [error, setError] = React.useState<any>();
 
   const run = React.useCallback(
-    async (worker: Worker) => {
+    async (worker: Worker<any, T>) => {
       if (isRunning) {
         throw new Error("Task is already running");
       }
       setIsRunning(true);
       setIsError(false);
-      setResult("");
+      setResult(undefined);
 
       try {
-        const result = await executor.run(worker);
+        const result = await executor.run<T>(worker);
         setResult(result);
-      } catch (e) {
+      } catch (err: any) {
+        setError(err);
         setIsError(true);
       } finally {
         setIsRunning(false);
@@ -68,5 +73,6 @@ export function useTask(executor: TaskExecutor) {
     isError,
     result,
     run,
+    error,
   };
 }
