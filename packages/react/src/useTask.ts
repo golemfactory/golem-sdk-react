@@ -42,9 +42,13 @@ export type { Worker };
  */
 export function useTask<T = any>(executor: TaskExecutor) {
   const [isRunning, setIsRunning] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
   const [result, setResult] = React.useState<T>();
   const [error, setError] = React.useState<any>(null);
+
+  /**
+   * @deprecated This property is deprecated and will be removed in the next major version. Check for `error` instead.
+   */
+  const [isError, setIsError] = React.useState(false);
 
   const run = React.useCallback(
     async (worker: Worker<any, T>) => {
