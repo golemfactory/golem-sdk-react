@@ -82,7 +82,7 @@ function MyComponent() {
 
 ```jsx
 function MyTask({ executor }) {
-  const { isRunning, isError, result, run } = useTask(executor);
+  const { isRunning, error, result, run } = useTask(executor);
   const onClick = () =>
     run(async (ctx) => {
       return (await ctx.run("echo", ["Hello world!"])).stdout;
@@ -93,7 +93,7 @@ function MyTask({ executor }) {
         Run task
       </button>
       {isRunning && <div>Task is running...</div>}
-      {isError && <div>Task failed</div>}
+      {error && <div>Task failed due to {error.toString()}</div>}
       {result && <div>Task result: {result}</div>}
     </div>
   );
