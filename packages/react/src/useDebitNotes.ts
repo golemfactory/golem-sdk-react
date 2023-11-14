@@ -11,6 +11,7 @@ import { useConfig } from "./useConfig";
  * @param {number} [options.limit] - The maximum number of debit notes to fetch.
  * @param {SWRConfiguration} [options.swrConfig] - Configuration options for the underlying SWR hook.
  * @returns An object containing the fetched debit notes, loading and validation states, error state, and a function to refetch the data.
+ *
  * @example
  * ```jsx
  * function MyComponent() {
@@ -48,6 +49,7 @@ export function useDebitNotes({
   swrConfig?: SWRConfiguration;
 } = {}) {
   const { yagnaClient, swrKey } = useConfig();
+
   const { data, isLoading, isValidating, error, mutate } = useSWR(
     [swrKey, "debit-notes", limit],
     async () => {
@@ -66,6 +68,7 @@ export function useDebitNotes({
       ...swrConfig,
     },
   );
+
   return {
     debitNotes: data,
     isLoading,

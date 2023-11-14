@@ -1,6 +1,7 @@
 import { ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
 import { useConfig } from "./useConfig";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+
 export { TaskExecutor };
 export type { ExecutorOptions };
 
@@ -37,7 +38,7 @@ export function useExecutor(
   const [executor, setExecutor] = useState<TaskExecutor | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [isTerminating, setIsTerminating] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<Error>();
   const config = useConfig();
   const isInitialized = !!executor;
 
@@ -70,9 +71,13 @@ export function useExecutor(
         ...options,
       });
       setExecutor(executor);
-      setError(null);
-    } catch (e) {
-      setError(e);
+      setError(undefined);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error(JSON.stringify(err)));
+      }
       removeBeforeUnloadHandler();
     } finally {
       setIsInitializing(false);
