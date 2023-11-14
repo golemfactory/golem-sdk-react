@@ -37,13 +37,13 @@ async function classifyOnGolem(
   const input = `/golem/input/img.${extension}`;
   const output = `/golem/output/out.json`;
   const imageData = await readFile(image);
+
   await runFunction(async (ctx) => {
     await ctx.uploadData(imageData, input);
     await ctx.run(`node index.js ${input} ${output}`);
     const result = await ctx.downloadData(output);
     const decoder = new TextDecoder();
-    const resultJson = JSON.parse(decoder.decode(result.data));
-    return resultJson;
+    return JSON.parse(decoder.decode(result.data));
   });
 }
 
@@ -57,7 +57,7 @@ export default function ImageClassification({
   const [image, setImage] = useState<File | null>(null);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
-  const { run, isError, isRunning, result } = useTask(executor);
+  const { run, error, isRunning, result } = useTask(executor);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) {
@@ -97,7 +97,7 @@ export default function ImageClassification({
         {isResultDefinedAndValid(result) && (
           <div className="max-w-sm">
             This image is a{" "}
-            <span className="font-bold">{result.className} </span>
+            <span className="font-bold">{result.className}</span>
             with a probability of{" "}
             <span className="font-bold">
               {new Decimal(result.probability).mul(100).toFixed(2)}%
@@ -121,7 +121,11 @@ export default function ImageClassification({
           </button>
         </div>
       </form>
-      {isError && <p className="badge badge-error">Something went wrong</p>}
+      {error && (
+        <p className="badge badge-error">
+          Task failed due to {error.toString()}
+        </p>
+      )}
     </div>
   );
 }

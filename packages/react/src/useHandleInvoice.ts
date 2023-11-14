@@ -9,17 +9,19 @@ interface Options {
 
 /**
  * A hook for handling the payment of an invoice.
- * @param invoice - Id of the invoice to be handled.
+ *
+ * @param invoice - ID of the invoice to be handled.
  * @param options - An object containing the following optional properties:
  * @param options.onAccepted - A callback function to be called when the invoice is accepted (for example to show a success message to the user)
  * @param options.onRejected - A callback function to be called when the invoice is rejected (for example to show an error message to the user)
  * @param options.allocationTimeoutMs - The timeout for the allocation in milliseconds (defaults to 60 seconds)
+ *
  * @returns An object containing the following properties:
  * - acceptInvoice: A function to accept the invoice.
  * - isLoading: A boolean indicating whether the hook is currently loading.
- * - isError: A boolean indicating whether an error occurred while handling the invoice.
+ * - error: Error that occurred while handling the invoice.
  * - isAccepted: A boolean indicating whether the invoice was accepted.
- * - reset: A function to reset the state of the hook (isLoading, isError, isAccepted)
+ * - reset: A function to reset the state of the hook (isLoading, error, isAccepted)
  */
 export function useHandleInvoice(
   invoice: string,
@@ -27,12 +29,12 @@ export function useHandleInvoice(
 ) {
   const { yagnaClient } = useConfig();
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const [error, setError] = useState<Error>();
 
   const reset = useCallback(() => {
     setIsLoading(false);
-    setIsError(false);
+    setError(undefined);
     setIsAccepted(false);
   }, []);
 
@@ -68,8 +70,12 @@ export function useHandleInvoice(
       });
       setIsAccepted(true);
       onAccepted?.();
-    } catch (e) {
-      setIsError(true);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error(JSON.stringify(err)));
+      }
       onRejected?.();
     } finally {
       setIsLoading(false);
@@ -79,8 +85,8 @@ export function useHandleInvoice(
   return {
     acceptInvoice,
     isLoading,
-    isError,
     isAccepted,
     reset,
+    error,
   };
 }

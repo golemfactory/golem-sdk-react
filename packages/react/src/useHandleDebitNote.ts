@@ -9,15 +9,17 @@ interface Options {
 
 /**
  * A hook that handles the acceptance of a debit note.
+ *
  * @param debitNote - The debit note to be accepted.
  * @param options - An optional object containing the following properties:
- * @param options.onAccepted: A function to be called when the debit note is accepted (for example to show a success message to the user).
- * @param options.onRejected: A function to be called when the debit note is rejected (for example to show an error message to the user).
- * @param options.allocationTimeoutMs: The timeout for the allocation in milliseconds (defaults to 60 seconds).
+ * @param options.onAccepted -  A function to be called when the debit note is accepted (for example to show a success message to the user).
+ * @param options.onRejected - A function to be called when the debit note is rejected (for example to show an error message to the user).
+ * @param options.allocationTimeoutMs - The timeout for the allocation in milliseconds (defaults to 60 seconds).
+ *
  * @returns An object containing the following properties:
  *   - acceptDebitNote: A function that accepts the debit note.
  *   - isLoading: A boolean indicating whether the hook is currently loading.
- *   - isError: A boolean indicating whether an error occurred while accepting the debit note.
+ *   - error: Error that occurred while accepting the debit note.
  *   - isAccepted: A boolean indicating whether the debit note was accepted.
  */
 export function useHandleDebitNote(
@@ -26,12 +28,12 @@ export function useHandleDebitNote(
 ) {
   const { yagnaClient } = useConfig();
   const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const [error, setError] = useState<Error>();
 
   const reset = useCallback(() => {
     setIsLoading(false);
-    setIsError(false);
+    setError(undefined);
     setIsAccepted(false);
   }, []);
 
@@ -67,8 +69,12 @@ export function useHandleDebitNote(
       });
       setIsAccepted(true);
       onAccepted?.();
-    } catch (e) {
-      setIsError(true);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error(JSON.stringify(err)));
+      }
       onRejected?.();
     } finally {
       setIsLoading(false);
@@ -78,7 +84,7 @@ export function useHandleDebitNote(
   return {
     acceptDebitNote,
     isLoading,
-    isError,
     isAccepted,
+    error,
   };
 }

@@ -9,6 +9,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended"
   ],
+  "ignorePatterns": ["dist"],
   "overrides": [
     {
       "env": {
@@ -32,6 +33,6 @@
     }
   },
   "rules": {
-    "prettier/prettier": "warn"
+    "prettier/prettier": "error"
   }
 }

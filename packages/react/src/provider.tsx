@@ -19,10 +19,12 @@ export type YagnaProviderConfig = {
 
 /**
  * Provides context for all hooks that interact with Yagna.
+ *
  * @param config - The configuration object for the provider.
  * @param config.yagnaAppKey - The API key for the Yagna client. This is required.
  * @param config.yagnaUrl - The base URL for the Yagna client. This is optional and defaults to "http://127.0.0.1:7465".
  * @param config.swrKey - The key used to prefix all SWR cache keys. This is optional and defaults to "golem-sdk".
+ *
  * @example
  * ```
  * <YagnaProvider config={{ yagnaAppKey: "myApiKey", yagnaUrl: "http://localhost:7465" }}>

@@ -1,8 +1,10 @@
 import { TaskExecutor } from "@golem-sdk/golem-js";
-import React from "react";
+import { useCallback, useState } from "react";
 
 // TODO: expose worker type in @golem-sdk/golem-js
-type Worker = Parameters<TaskExecutor["run"]>[0];
+// Import for use in the hook
+import { Worker } from "@golem-sdk/golem-js/dist/task";
+// Export for use by SDK users
 export type { Worker };
 
 /**
@@ -12,14 +14,14 @@ export type { Worker };
  *
  * @returns An object containing the following properties:
  * - `isRunning`: A boolean indicating whether the task is currently running.
- * - `isError`: A boolean indicating whether an error occurred while running the task.
  * - `result`: The result of the task, if it has finished running.
  * - `run`: A function that can be called to run the task.
+ * - `error`: The error that has occurred - undefined otherwise.
  *
  * @example
  * ```jsx
  * function MyComponent({ executor }) {
- *   const { isRunning, isError, result, run } = useTask(executor);
+ *   const { isRunning, error, result, run } = useTask(executor);
  *   const onClick = () =>
  *     run(async (ctx) => {
  *       return (await ctx.run("echo", ["Hello world!"])).stdout;
@@ -30,32 +32,36 @@ export type { Worker };
  *         Run task
  *       </button>
  *       {isRunning && <div>Task is running...</div>}
- *       {isError && <div>Task failed</div>}
+ *       {error && <div>Task failed due to: {error}</div>}
  *       {result && <div>Task result: {result}</div>}
  *     </div>
  *   );
  * }
  * ```
  */
-export function useTask(executor: TaskExecutor) {
-  const [isRunning, setIsRunning] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-  const [result, setResult] = React.useState<unknown>();
+export function useTask<TData = unknown>(executor: TaskExecutor) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [result, setResult] = useState<TData>();
+  const [error, setError] = useState<Error>();
 
-  const run = React.useCallback(
-    async (worker: Worker) => {
+  const run = useCallback(
+    async (worker: Worker<unknown, TData>) => {
       if (isRunning) {
         throw new Error("Task is already running");
       }
+
       setIsRunning(true);
-      setIsError(false);
-      setResult("");
+      setResult(undefined);
 
       try {
-        const result = await executor.run(worker);
+        const result = await executor.run<TData>(worker);
         setResult(result);
-      } catch (e) {
-        setIsError(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error(JSON.stringify(err)));
+        }
       } finally {
         setIsRunning(false);
       }
@@ -65,8 +71,8 @@ export function useTask(executor: TaskExecutor) {
 
   return {
     isRunning,
-    isError,
     result,
     run,
+    error,
   };
 }
