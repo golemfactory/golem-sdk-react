@@ -1,9 +1,22 @@
 import useSwr, { SWRConfiguration } from "swr";
 import { useConfig } from "./useConfig";
 import { yaPayment } from "ya-ts-client";
+import { InvoiceProcessor } from "@golem-sdk/golem-js";
 
 export const InvoiceStatus = yaPayment.InvoiceStatus;
 export type InvoiceStatus = yaPayment.InvoiceStatus;
+
+export type InvoiceSearchParameters = {
+  after?: Date;
+  limit?: number;
+  statuses?: string[];
+  providerIds?: string[];
+  minAmount?: string | number;
+  maxAmount?: string | number;
+  providerWallets?: string[];
+  invoiceIds?: string[];
+  paymentPlatforms?: string[];
+};
 
 /**
  * A hook that fetches invoices from the Yagna API.
@@ -39,22 +52,34 @@ export type InvoiceStatus = yaPayment.InvoiceStatus;
  * ```
  */
 export function useInvoices({
-  after,
-  limit,
   swrConfig,
-}: {
-  after?: string;
-  limit?: number;
+  ...searchParameters
+}: InvoiceSearchParameters & {
   swrConfig?: SWRConfiguration;
 } = {}) {
-  const { yagnaClient, swrKey } = useConfig();
+  const { swrKey, yagnaOptions } = useConfig();
   const { data, isLoading, isValidating, error, mutate } = useSwr(
-    [swrKey, "invoices", after, limit],
+    [swrKey, "invoices", searchParameters, yagnaOptions],
     async () => {
-      return yagnaClient
-        .getApi()
-        .payment.getInvoices(after, limit)
-        .then((response) => response.data);
+      const apiKey = yagnaOptions.apiKey;
+      const basePath = yagnaOptions.basePath;
+      if (!apiKey) {
+        throw new Error(
+          "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+        );
+      }
+      const invoiceProcessor = await InvoiceProcessor.create({
+        apiKey,
+        basePath,
+      });
+      if (searchParameters.invoiceIds) {
+        return Promise.all(
+          searchParameters.invoiceIds.map((id) =>
+            invoiceProcessor.fetchSingleInvoice(id),
+          ),
+        );
+      }
+      return invoiceProcessor.collectInvoices(searchParameters);
     },
     {
       keepPreviousData: true,
