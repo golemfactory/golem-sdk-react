@@ -29,7 +29,11 @@ export type InvoiceSearchParameters = {
  * @example
  * ```jsx
  * function MyComponent() {
- *   const { invoices, isLoading, error, refetch } = useInvoices();
+ *   const { invoices, isLoading, error, refetch } = useInvoices({
+ *     limit: 10,
+ *     statuses: ["RECEIVED"],
+ *     after: new Date("2021-01-01"),
+ *   });
  *   if (isLoading) {
  *     return <div>Loading...</div>;
  *   }

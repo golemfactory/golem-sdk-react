@@ -12,15 +12,15 @@ import useSwr from "swr";
  * @example
  * ```jsx
  * function MyComponent() {
- *  const { isConnected, reconnect, isLoading, error } = useYagna();
- *  if (isLoading) {
- *    return <div>Loading...</div>;
- *  }
+ *  const { isConnected, appKey, setAppKey } = useYagna();
+ *  const inputRef = useRef(null);
  *  return (
  *    <div>
- *      <div>Yagna is {isConnected ? "connected" : "disconnected"}</div>
- *      <button onClick={reconnect} disabled={!isConnected}>Reconnect</button>
- *      {error && <div>Error: {error.toString()}</div>}
+ *      <div>Connected to Yagna: {isConnected ? "yes" : "no"}</div>
+ *      <input ref={inputRef} />
+ *      <button onClick={() => setAppKey(inputRef.current.value)}>
+ *        Set app key
+ *      </button>
  *    </div>
  *  );
  * }
