@@ -1,4 +1,5 @@
 import { useYagna } from "@golem-sdk/react";
+import SetAppKeyDropdown from "../connection/SetAppKeyDropdown";
 
 interface NavbarProps {
   activeTab: "run-task" | "invoices" | "debit-notes";
@@ -6,10 +7,10 @@ interface NavbarProps {
 }
 
 export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
-  const { isConnected, reconnect, isLoading, error } = useYagna();
+  const { isConnected, reconnect, isLoading } = useYagna();
 
   return (
-    <header className="navbar bg-base-100">
+    <header className="navbar bg-base-100 border-b-2 h-4">
       <div className="navbar-start">
         <span className="btn btn-ghost normal-case text-xl">
           Golem + React = 😻
@@ -56,7 +57,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
         </ul>
       </div>
       <div className="navbar-end flex gap-4">
-        {error && <span className="badge badge-error">{`${error}`}</span>}
+        <SetAppKeyDropdown />
         <button
           className="btn "
           onClick={() => {

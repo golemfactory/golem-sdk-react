@@ -25,5 +25,8 @@ node_modules/
 .vscode/
 .idea/
 
+# Ignore vercel files
+.vercel/
+
 # Ignore build directory
 dist/

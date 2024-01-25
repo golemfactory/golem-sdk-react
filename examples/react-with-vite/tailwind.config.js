@@ -3,10 +3,26 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        "3xl": "1921px",
+      },
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light"],
+    themes: [
+      {
+        light: {
+          ...require("daisyui/src/theming/themes")["light"],
+          primary: "#181EA9",
+          "base-100": "#F6F8FC",
+          error: "#A71919",
+          success: "#367946",
+
+          "--rounded-btn": "3px",
+        },
+      },
+    ],
   },
 };

@@ -31,7 +31,9 @@ function readFile(file: File): Promise<Uint8Array> {
 
 async function classifyOnGolem(
   image: File,
-  runFunction: (ctx: Worker) => Promise<void>,
+  runFunction: (
+    ctx: Worker<{ className: string; probability: number }>,
+  ) => Promise<void>,
 ) {
   const extension = image.name.split(".").pop();
   const input = `/golem/input/img.${extension}`;
