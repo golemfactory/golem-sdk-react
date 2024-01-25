@@ -2,8 +2,8 @@ import { useYagna } from "@golem-sdk/react";
 import SetAppKeyDropdown from "../connection/SetAppKeyDropdown";
 
 interface NavbarProps {
-  activeTab: "run-task" | "invoices" | "debit-notes";
-  setActiveTab: (tab: "run-task" | "invoices" | "debit-notes") => void;
+  activeTab: "run-task" | "invoices";
+  setActiveTab: (tab: "run-task" | "invoices") => void;
 }
 
 export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
@@ -27,7 +27,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               }`}
               onClick={() => setActiveTab("run-task")}
             >
-              Run Task
+              Run a simple Task
             </a>
           </li>
           <li>
@@ -39,19 +39,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
               }`}
               onClick={() => setActiveTab("invoices")}
             >
-              Invoices
-            </a>
-          </li>
-          <li>
-            <a
-              className={`${
-                activeTab === "debit-notes"
-                  ? "text-primary font-bold"
-                  : "text-base-content"
-              }`}
-              onClick={() => setActiveTab("debit-notes")}
-            >
-              Debit Notes
+              Search your invoice history
             </a>
           </li>
         </ul>

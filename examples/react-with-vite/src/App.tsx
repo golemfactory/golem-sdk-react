@@ -1,7 +1,6 @@
 import Navbar from "./header/Navbar";
 import React, { useState } from "react";
 import RunTaskCard from "./run-task/RunTaskCard";
-import DebitNotesTable from "./debit-notes/DebitNotesTable";
 import { useYagna } from "@golem-sdk/react";
 import ConnectToYagna from "./connection/ConnectToYagna";
 import InvoicesTab from "./invoices/InvoicesTab";
@@ -26,21 +25,14 @@ function Tab({
 function App() {
   if (
     !window.location.hash ||
-    !["run-task", "invoices", "debit-notes"].includes(
-      window.location.hash.slice(1),
-    )
+    !["run-task", "invoices"].includes(window.location.hash.slice(1))
   ) {
     window.location.hash = "run-task";
   }
-  const [activeTab, _setActiveTab] = useState<
-    "run-task" | "invoices" | "debit-notes"
-  >(
-    (window.location.hash.slice(1) as
-      | "run-task"
-      | "invoices"
-      | "debit-notes") || "run-task",
+  const [activeTab, _setActiveTab] = useState<"run-task" | "invoices">(
+    (window.location.hash.slice(1) as "run-task" | "invoices") || "run-task",
   );
-  const setActiveTab = (tab: "run-task" | "invoices" | "debit-notes") => {
+  const setActiveTab = (tab: "run-task" | "invoices") => {
     window.location.hash = tab;
     _setActiveTab(tab);
   };
@@ -60,9 +52,6 @@ function App() {
             </Tab>
             <Tab visible={activeTab === "invoices"}>
               <InvoicesTab />
-            </Tab>
-            <Tab visible={activeTab === "debit-notes"}>
-              <DebitNotesTable />
             </Tab>
           </>
         )}

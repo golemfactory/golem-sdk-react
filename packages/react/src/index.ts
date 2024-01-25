@@ -7,6 +7,4 @@ export {
   InvoiceStatus,
   type InvoiceSearchParameters,
 } from "./useInvoices";
-export { useDebitNotes } from "./useDebitNotes";
 export { useHandleInvoice } from "./useHandleInvoice";
-export { useHandleDebitNote } from "./useHandleDebitNote";
