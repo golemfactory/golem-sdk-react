@@ -27,7 +27,9 @@ export function useHandleInvoice(
   invoice: string,
   { onAccepted, onRejected, allocationTimeoutMs = 60_000 }: Options = {},
 ) {
-  const { yagnaClient } = useConfig();
+  const {
+    yagnaOptions: { client },
+  } = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [error, setError] = useState<Error>();
@@ -42,10 +44,15 @@ export function useHandleInvoice(
     if (isLoading) {
       return;
     }
+    if (!client) {
+      throw new Error(
+        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+      );
+    }
     reset();
     setIsLoading(true);
     try {
-      const invoiceDetails = await yagnaClient
+      const invoiceDetails = await client
         .getApi()
         .payment.getInvoice(invoice)
         .then((res) => res.data);
@@ -60,11 +67,11 @@ export function useHandleInvoice(
         spentAmount: "",
         allocationId: "",
       };
-      const { allocationId } = await yagnaClient
+      const { allocationId } = await client
         .getApi()
         .payment.createAllocation(allocation)
         .then((res) => res.data);
-      await yagnaClient.getApi().payment.acceptInvoice(invoice, {
+      await client.getApi().payment.acceptInvoice(invoice, {
         allocationId,
         totalAmountAccepted: invoiceDetails.amount,
       });
@@ -80,7 +87,7 @@ export function useHandleInvoice(
     } finally {
       setIsLoading(false);
     }
-  }, [invoice, isLoading, onAccepted, onRejected, reset, yagnaClient]);
+  }, [invoice, isLoading, onAccepted, onRejected, reset, client]);
 
   return {
     acceptInvoice,

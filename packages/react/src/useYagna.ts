@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useConfig } from "./useConfig";
 import useSwr from "swr";
 
@@ -26,12 +27,15 @@ import useSwr from "swr";
  * ```
  */
 export function useYagna() {
-  const { yagnaClient, swrKey } = useConfig();
+  const { yagnaOptions, swrKey, setYagnaOptions } = useConfig();
 
   const { isLoading, error, mutate } = useSwr(
-    [swrKey, "yagna-connection-status"],
+    [swrKey, "yagna-connection-status", yagnaOptions],
     async () => {
-      return yagnaClient.getApi().identity.getIdentity();
+      if (!yagnaOptions.client) {
+        throw new Error("Cannot connect to Yagna, provide an app key.");
+      }
+      return yagnaOptions.client.getApi().identity.getIdentity();
     },
     {
       refreshInterval: 3000, // ping yagna every 3 seconds to check if it's still connected
@@ -40,10 +44,24 @@ export function useYagna() {
     },
   );
 
+  const setAppKey = useCallback(
+    (appKey: string) => setYagnaOptions({ apiKey: appKey }),
+    [setYagnaOptions],
+  );
+  const unsetAppKey = useCallback(
+    () => setYagnaOptions({ apiKey: null }),
+    [setYagnaOptions],
+  );
+  const isAppKeySet = !!yagnaOptions.apiKey;
+
   return {
     isConnected: !error && !isLoading,
     reconnect: mutate,
     isLoading,
     error,
+    setAppKey,
+    unsetAppKey,
+    isAppKeySet,
+    appKey: yagnaOptions.apiKey,
   };
 }

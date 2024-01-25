@@ -46,6 +46,11 @@ export function useExecutor(
     if (isInitialized || isInitializing) {
       throw new Error("Executor is already initialized");
     }
+    if (!config.yagnaOptions.apiKey) {
+      throw new Error(
+        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+      );
+    }
 
     setIsInitializing(true);
 
@@ -57,15 +62,6 @@ export function useExecutor(
         yagnaOptions: {
           apiKey: config.yagnaOptions.apiKey,
           basePath: config.yagnaOptions.basePath,
-        },
-        logger: {
-          log: (msg) => console.log(msg),
-          info: (msg) => console.log(msg),
-          warn: (msg) => console.log(msg),
-          error: (msg) => console.log(msg),
-          debug: (msg) => console.log(msg),
-          level: "debug",
-          setLevel: (level) => console.log(level),
         },
         enableLogging: false,
         ...options,

@@ -45,7 +45,7 @@ export function useTask<TData = unknown>(executor: TaskExecutor) {
   const [error, setError] = useState<Error>();
 
   const run = useCallback(
-    async (worker: Worker<unknown, TData>) => {
+    async (worker: Worker<TData>) => {
       if (isRunning) {
         throw new Error("Task is already running");
       }

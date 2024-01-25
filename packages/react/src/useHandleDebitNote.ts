@@ -26,7 +26,9 @@ export function useHandleDebitNote(
   debitNote: string,
   { onAccepted, onRejected, allocationTimeoutMs = 60_000 }: Options = {},
 ) {
-  const { yagnaClient } = useConfig();
+  const {
+    yagnaOptions: { client },
+  } = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [error, setError] = useState<Error>();
@@ -41,10 +43,15 @@ export function useHandleDebitNote(
     if (isLoading) {
       return;
     }
+    if (!client) {
+      throw new Error(
+        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+      );
+    }
     reset();
     setIsLoading(true);
     try {
-      const debitNoteDetails = await yagnaClient
+      const debitNoteDetails = await client
         .getApi()
         .payment.getDebitNote(debitNote)
         .then((res) => res.data);
@@ -59,11 +66,11 @@ export function useHandleDebitNote(
         spentAmount: "",
         allocationId: "",
       };
-      const { allocationId } = await yagnaClient
+      const { allocationId } = await client
         .getApi()
         .payment.createAllocation(allocation)
         .then((res) => res.data);
-      await yagnaClient.getApi().payment.acceptDebitNote(debitNote, {
+      await client.getApi().payment.acceptDebitNote(debitNote, {
         allocationId,
         totalAmountAccepted: debitNoteDetails.totalAmountDue,
       });
@@ -79,7 +86,7 @@ export function useHandleDebitNote(
     } finally {
       setIsLoading(false);
     }
-  }, [debitNote, isLoading, onAccepted, onRejected, reset, yagnaClient]);
+  }, [debitNote, isLoading, onAccepted, onRejected, reset, client]);
 
   return {
     acceptDebitNote,

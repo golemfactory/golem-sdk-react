@@ -48,11 +48,19 @@ export function useDebitNotes({
   limit?: number;
   swrConfig?: SWRConfiguration;
 } = {}) {
-  const { yagnaClient, swrKey } = useConfig();
+  const {
+    yagnaOptions: { client: yagnaClient },
+    swrKey,
+  } = useConfig();
 
   const { data, isLoading, isValidating, error, mutate } = useSWR(
-    [swrKey, "debit-notes", limit],
+    [swrKey, "debit-notes", limit, yagnaClient],
     async () => {
+      if (!yagnaClient) {
+        throw new Error(
+          "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+        );
+      }
       return (
         yagnaClient
           .getApi()
