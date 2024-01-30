@@ -1,5 +1,5 @@
 import { useYagna } from "@golem-sdk/react";
-import SetAppKeyDropdown from "../connection/SetAppKeyDropdown";
+import SetYagnaOptionsButton from "../connection/SetYagnaOptionsButton";
 
 interface NavbarProps {
   activeTab: "run-task" | "invoices";
@@ -45,7 +45,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
         </ul>
       </div>
       <div className="navbar-end flex gap-4">
-        <SetAppKeyDropdown />
+        {isConnected && <SetYagnaOptionsButton />}
         <button
           className="btn "
           onClick={() => {

@@ -56,13 +56,15 @@ If you just want to see how the demo application looks like, you can check out t
 
 ```jsx
 function MyComponent() {
-  const { isConnected, appKey, setAppKey } = useYagna();
+  const { isConnected, appKey, setYagnaOptions } = useYagna();
   const inputRef = useRef(null);
   return (
     <div>
       <div>Connected to Yagna: {isConnected ? "yes" : "no"}</div>
       <input ref={inputRef} />
-      <button onClick={() => setAppKey(inputRef.current.value)}>
+      <button
+        onClick={() => setYagnaOptions({ apiKey: inputRef.current.value })}
+      >
         Set app key
       </button>
     </div>

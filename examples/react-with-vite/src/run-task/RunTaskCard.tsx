@@ -11,7 +11,7 @@ export default function RunTaskCard() {
     subnetTag: "public",
     payment: {
       driver: "erc20",
-      network: "goerli",
+      network: "holesky",
     },
     minCpuCores: 1,
     minMemGib: 1,

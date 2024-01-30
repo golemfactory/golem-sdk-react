@@ -12,13 +12,13 @@ import useSwr from "swr";
  * @example
  * ```jsx
  * function MyComponent() {
- *  const { isConnected, appKey, setAppKey } = useYagna();
+ *  const { isConnected, appKey, setYagnaOptions } = useYagna();
  *  const inputRef = useRef(null);
  *  return (
  *    <div>
  *      <div>Connected to Yagna: {isConnected ? "yes" : "no"}</div>
  *      <input ref={inputRef} />
- *      <button onClick={() => setAppKey(inputRef.current.value)}>
+ *      <button onClick={() => setYagnaOptions({apiKey: inputRef.current.value})}>
  *        Set app key
  *      </button>
  *    </div>
@@ -27,7 +27,11 @@ import useSwr from "swr";
  * ```
  */
 export function useYagna() {
-  const { yagnaOptions, swrKey, setYagnaOptions } = useConfig();
+  const {
+    yagnaOptions,
+    swrKey,
+    setYagnaOptions: setInternalYagnaOptions,
+  } = useConfig();
 
   const { isLoading, error, mutate } = useSwr(
     [swrKey, "yagna-connection-status", yagnaOptions],
@@ -44,14 +48,20 @@ export function useYagna() {
     },
   );
 
-  const setAppKey = useCallback(
-    (appKey: string) => setYagnaOptions({ apiKey: appKey }),
-    [setYagnaOptions],
+  const setYagnaOptions = useCallback(
+    (options: { apiKey?: string | null; basePath?: string }) => {
+      setInternalYagnaOptions({
+        apiKey:
+          options.apiKey === undefined ? yagnaOptions.apiKey : options.apiKey,
+        basePath:
+          options.basePath === undefined
+            ? yagnaOptions.basePath
+            : options.basePath,
+      });
+    },
+    [setInternalYagnaOptions, yagnaOptions],
   );
-  const unsetAppKey = useCallback(
-    () => setYagnaOptions({ apiKey: null }),
-    [setYagnaOptions],
-  );
+
   const isAppKeySet = !!yagnaOptions.apiKey;
 
   return {
@@ -59,9 +69,9 @@ export function useYagna() {
     reconnect: mutate,
     isLoading,
     error,
-    setAppKey,
-    unsetAppKey,
+    setYagnaOptions,
     isAppKeySet,
     appKey: yagnaOptions.apiKey,
+    basePath: yagnaOptions.basePath,
   };
 }

@@ -2,8 +2,9 @@ import { useYagna } from "@golem-sdk/react";
 import { useRef } from "react";
 
 export default function ConnectToYagna() {
-  const { reconnect, appKey, setAppKey, unsetAppKey } = useYagna();
+  const { reconnect, appKey, basePath, setYagnaOptions } = useYagna();
   const appKeyInputRef = useRef<HTMLInputElement>(null);
+  const basePathInputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="card max-w-3xl">
       <div className="card-body">
@@ -35,23 +36,32 @@ export default function ConnectToYagna() {
             </code>
           </pre>
         </div>
-        <h3 className="font-bold text-lg">2. Set the app-key</h3>
+        <h3 className="font-bold text-lg">2. Set the app-key and yagna url</h3>
         <div className="flex flex-row items-center gap-1">
+          <span className="text-gray-500">App-key:</span>
           <input
             className="input input-bordered input-xl"
             placeholder="Yagna app-here here"
             defaultValue={appKey || ""}
             ref={appKeyInputRef}
           />
+          <span className="text-gray-500">Yagna url:</span>
+          <input
+            className="input input-bordered input-xl"
+            placeholder="Yagna url here"
+            defaultValue={basePath || "http://127.0.0.1:7465"}
+            ref={basePathInputRef}
+          />
+
           <button
             className="btn btn-primary btn-xl min-w-0"
             onClick={() => {
-              const newAppKey = appKeyInputRef.current?.value || null;
-              if (newAppKey) {
-                setAppKey(newAppKey);
-              } else {
-                unsetAppKey();
-              }
+              const newAppKey = appKeyInputRef.current?.value || "";
+              const newBasePath = basePathInputRef.current?.value || "";
+              setYagnaOptions({
+                apiKey: newAppKey,
+                basePath: newBasePath,
+              });
             }}
           >
             Save
