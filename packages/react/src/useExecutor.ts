@@ -84,7 +84,7 @@ export function useExecutor(
     removeBeforeUnloadHandler();
     if (executor && !isTerminating) {
       setIsTerminating(true);
-      await executor.end();
+      await executor.shutdown();
       setExecutor(null);
       setIsTerminating(false);
     }
