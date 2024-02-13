@@ -17,7 +17,7 @@
     }
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^0.12.0",
+    "@golem-sdk/golem-js": "^2.0.0",
     "swr": "^2.2.2"
   },
   "devDependencies": {
@@ -55,6 +55,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "tsc -w -p tsconfig.build.json --module esNext --outDir dist/esm --target es6",
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -p tsconfig.build.json --module commonjs --outDir dist/cjs --target es5",

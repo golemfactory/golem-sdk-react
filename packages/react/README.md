@@ -16,9 +16,7 @@ bun add @golem-sdk/react
 Then make sure to wrap your app with the `YagnaProvider` component:
 
 ```jsx
-<YagnaProvider
-  config={{ yagnaAppKey: "myApiKey", yagnaUrl: "http://localhost:7465" }}
->
+<YagnaProvider>
   <App />
 </YagnaProvider>
 ```
@@ -44,35 +42,31 @@ npm install
 npm run build
 ```
 
-Then create a `.env` file in the `examples/react-with-vite` directory with the following content:
-
-```
-VITE_YAGNA_APPKEY=<your-yagna-app-key>
-```
-
-Finally, run the demo application:
+Then run the following command to start the demo application:
 
 ```
 npm run example:vite
 ```
 
+If you just want to see how the demo application looks like, you can check out the live version [here](https://golem-react-showcase.vercel.app/).
+
 ## Features
 
-### `useYagna` - check if you're connected to Yagna
+### `useYagna` - check if you're connected to Yagna and manage the app-key
 
 ```jsx
 function MyComponent() {
-  const { isConnected, reconnect, isLoading, error } = useYagna();
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const { isConnected, appKey, setYagnaOptions } = useYagna();
+  const inputRef = useRef(null);
   return (
     <div>
-      <div>Yagna is {isConnected ? "connected" : "disconnected"}</div>
-      <button onClick={reconnect} disabled={!isConnected}>
-        Reconnect
+      <div>Connected to Yagna: {isConnected ? "yes" : "no"}</div>
+      <input ref={inputRef} />
+      <button
+        onClick={() => setYagnaOptions({ apiKey: inputRef.current.value })}
+      >
+        Set app key
       </button>
-      {error && <div>Error: {error.toString()}</div>}
     </div>
   );
 }
@@ -147,7 +141,11 @@ function Invoice({ invoiceId }) {
 }
 
 function MyComponent() {
-  const { invoices, isLoading, error, refetch } = useInvoices();
+  const { invoices, isLoading, error, refetch } = useInvoices({
+    limit: 10,
+    statuses: ["RECEIVED"],
+    after: new Date("2021-01-01"),
+  });
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -159,49 +157,6 @@ function MyComponent() {
       <ul>
         {invoices.map((invoice) => (
           <Invoice key={invoice.invoiceId} invoiceId={invoice.invoiceId} />
-        ))}
-      </ul>
-      <button onClick={refetch}> Refresh </button>
-    </div>
-  );
-}
-```
-
-### `useDebitNotes` + `useHandleDebitNote` - list and handle debit notes
-
-```jsx
-function DebitNote({ debitNoteId }) {
-  const { acceptDebitNote } = useHandleDebitNote();
-
-  return (
-    <li key={debitNoteId}>
-      {debitNoteId} - {debitNote.status}
-      <button
-        onClick={acceptDebitNote}
-        disabled={debitNote.status !== "RECEIVED"}
-      >
-        Accept
-      </button>
-    </li>
-  );
-}
-
-function MyComponent() {
-  const { debitNotes, isLoading, error, refetch } = useDebitNotes();
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Error: {error.toString()}</div>;
-  }
-  return (
-    <div>
-      <ul>
-        {debitNotes.map((debitNote) => (
-          <DebitNote
-            key={debitNote.debitNoteId}
-            debitNoteId={debitNote.debitNoteId}
-          />
         ))}
       </ul>
       <button onClick={refetch}> Refresh </button>

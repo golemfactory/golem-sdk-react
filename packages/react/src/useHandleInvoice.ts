@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useConfig } from "./useConfig";
+import { InvoiceProcessor } from "@golem-sdk/golem-js";
 
 interface Options {
   onAccepted?: () => void;
@@ -25,9 +26,9 @@ interface Options {
  */
 export function useHandleInvoice(
   invoice: string,
-  { onAccepted, onRejected, allocationTimeoutMs = 60_000 }: Options = {},
+  { onAccepted, onRejected }: Options = {},
 ) {
-  const { yagnaClient } = useConfig();
+  const { yagnaOptions } = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [error, setError] = useState<Error>();
@@ -42,31 +43,23 @@ export function useHandleInvoice(
     if (isLoading) {
       return;
     }
+    const apiKey = yagnaOptions.apiKey;
+    const basePath = yagnaOptions.basePath;
+    if (!apiKey) {
+      throw new Error(
+        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+      );
+    }
     reset();
     setIsLoading(true);
     try {
-      const invoiceDetails = await yagnaClient
-        .getApi()
-        .payment.getInvoice(invoice)
-        .then((res) => res.data);
-      const allocation = {
-        totalAmount: invoiceDetails.amount,
-        paymentPlatform: invoiceDetails.paymentPlatform,
-        address: invoiceDetails.payerAddr,
-        timestamp: new Date().toISOString(),
-        timeout: new Date(Date.now() + allocationTimeoutMs).toISOString(),
-        makeDeposit: false,
-        remainingAmount: "",
-        spentAmount: "",
-        allocationId: "",
-      };
-      const { allocationId } = await yagnaClient
-        .getApi()
-        .payment.createAllocation(allocation)
-        .then((res) => res.data);
-      await yagnaClient.getApi().payment.acceptInvoice(invoice, {
-        allocationId,
-        totalAmountAccepted: invoiceDetails.amount,
+      const invoiceProcessor = await InvoiceProcessor.create({
+        apiKey,
+        basePath,
+      });
+      const invoiceDetails = await invoiceProcessor.fetchSingleInvoice(invoice);
+      await invoiceProcessor.acceptInvoice({
+        invoice: invoiceDetails,
       });
       setIsAccepted(true);
       onAccepted?.();
@@ -80,7 +73,7 @@ export function useHandleInvoice(
     } finally {
       setIsLoading(false);
     }
-  }, [invoice, isLoading, onAccepted, onRejected, reset, yagnaClient]);
+  }, [invoice, isLoading, onAccepted, onRejected, reset, yagnaOptions]);
 
   return {
     acceptInvoice,

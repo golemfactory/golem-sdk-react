@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useConfig } from "./useConfig";
 import useSwr from "swr";
 
@@ -11,27 +12,34 @@ import useSwr from "swr";
  * @example
  * ```jsx
  * function MyComponent() {
- *  const { isConnected, reconnect, isLoading, error } = useYagna();
- *  if (isLoading) {
- *    return <div>Loading...</div>;
- *  }
+ *  const { isConnected, appKey, setYagnaOptions } = useYagna();
+ *  const inputRef = useRef(null);
  *  return (
  *    <div>
- *      <div>Yagna is {isConnected ? "connected" : "disconnected"}</div>
- *      <button onClick={reconnect} disabled={!isConnected}>Reconnect</button>
- *      {error && <div>Error: {error.toString()}</div>}
+ *      <div>Connected to Yagna: {isConnected ? "yes" : "no"}</div>
+ *      <input ref={inputRef} />
+ *      <button onClick={() => setYagnaOptions({apiKey: inputRef.current.value})}>
+ *        Set app key
+ *      </button>
  *    </div>
  *  );
  * }
  * ```
  */
 export function useYagna() {
-  const { yagnaClient, swrKey } = useConfig();
+  const {
+    yagnaOptions,
+    swrKey,
+    setYagnaOptions: setInternalYagnaOptions,
+  } = useConfig();
 
   const { isLoading, error, mutate } = useSwr(
-    [swrKey, "yagna-connection-status"],
+    [swrKey, "yagna-connection-status", yagnaOptions],
     async () => {
-      return yagnaClient.getApi().identity.getIdentity();
+      if (!yagnaOptions.client) {
+        throw new Error("Cannot connect to Yagna, provide an app key.");
+      }
+      return yagnaOptions.client.getApi().identity.getIdentity();
     },
     {
       refreshInterval: 3000, // ping yagna every 3 seconds to check if it's still connected
@@ -40,10 +48,30 @@ export function useYagna() {
     },
   );
 
+  const setYagnaOptions = useCallback(
+    (options: { apiKey?: string | null; basePath?: string }) => {
+      setInternalYagnaOptions({
+        apiKey:
+          options.apiKey === undefined ? yagnaOptions.apiKey : options.apiKey,
+        basePath:
+          options.basePath === undefined
+            ? yagnaOptions.basePath
+            : options.basePath,
+      });
+    },
+    [setInternalYagnaOptions, yagnaOptions],
+  );
+
+  const isAppKeySet = !!yagnaOptions.apiKey;
+
   return {
     isConnected: !error && !isLoading,
     reconnect: mutate,
     isLoading,
     error,
+    setYagnaOptions,
+    isAppKeySet,
+    appKey: yagnaOptions.apiKey,
+    basePath: yagnaOptions.basePath,
   };
 }

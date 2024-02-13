@@ -31,7 +31,9 @@ function readFile(file: File): Promise<Uint8Array> {
 
 async function classifyOnGolem(
   image: File,
-  runFunction: (ctx: Worker) => Promise<void>,
+  runFunction: (
+    ctx: Worker<{ className: string; probability: number }>,
+  ) => Promise<void>,
 ) {
   const extension = image.name.split(".").pop();
   const input = `/golem/input/img.${extension}`;
@@ -97,8 +99,8 @@ export default function ImageClassification({
         {isResultDefinedAndValid(result) && (
           <div className="max-w-sm">
             This image is a{" "}
-            <span className="font-bold">{result.className}</span>
-            with a probability of{" "}
+            <span className="font-bold">{result.className}</span> with a
+            probability of{" "}
             <span className="font-bold">
               {new Decimal(result.probability).mul(100).toFixed(2)}%
             </span>
