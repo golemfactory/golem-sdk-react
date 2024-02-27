@@ -1,4 +1,4 @@
-import { TaskExecutor } from "@golem-sdk/golem-js";
+import { TaskExecutor } from "@golem-sdk/task-executor";
 import { Worker, useTask } from "@golem-sdk/react";
 import Decimal from "decimal.js";
 import { useState } from "react";

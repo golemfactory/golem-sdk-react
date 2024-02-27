@@ -1,4 +1,4 @@
-import { TaskExecutor } from "@golem-sdk/golem-js";
+import { TaskExecutor } from "@golem-sdk/task-executor";
 import { useCallback, useState } from "react";
 
 // TODO: expose worker type in @golem-sdk/golem-js
