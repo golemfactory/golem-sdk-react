@@ -1,4 +1,4 @@
-import { ExecutorOptions, TaskExecutor } from "@golem-sdk/golem-js";
+import { ExecutorOptions, TaskExecutor } from "@golem-sdk/task-executor";
 import { useConfig } from "./useConfig";
 import { useCallback, useState } from "react";
 

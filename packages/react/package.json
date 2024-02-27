@@ -17,7 +17,8 @@
     }
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^2.0.0",
+    "@golem-sdk/golem-js": "^2.2.0",
+    "@golem-sdk/task-executor": "^1.0.1",
     "swr": "^2.2.2"
   },
   "devDependencies": {
