@@ -1,10 +1,15 @@
 import useSwr, { SWRConfiguration } from "swr";
 import { useConfig } from "./useConfig";
-import { yaPayment } from "ya-ts-client";
-import { InvoiceProcessor } from "@golem-sdk/golem-js";
+import { GolemNetwork, NullStorageProvider } from "@golem-sdk/golem-js";
 
-export const InvoiceStatus = yaPayment.InvoiceStatus;
-export type InvoiceStatus = yaPayment.InvoiceStatus;
+export type InvoiceStatus =
+  | "ISSUED"
+  | "RECEIVED"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "FAILED"
+  | "SETTLED"
+  | "CANCELLED";
 
 export type InvoiceSearchParameters = {
   after?: Date;
@@ -72,10 +77,15 @@ export function useInvoices({
           "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
         );
       }
-      const invoiceProcessor = await InvoiceProcessor.create({
-        apiKey,
-        basePath,
+      const glm = new GolemNetwork({
+        api: {
+          key: apiKey,
+          url: basePath,
+        },
+        dataTransferProtocol: new NullStorageProvider(),
       });
+      await glm.connect();
+      const invoiceProcessor = glm.payment.createInvoiceProcessor();
       if (searchParameters.invoiceIds) {
         return Promise.all(
           searchParameters.invoiceIds.map((id) =>

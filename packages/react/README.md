@@ -78,8 +78,8 @@ function MyComponent() {
 function MyTask({ executor }) {
   const { isRunning, error, result, run } = useTask(executor);
   const onClick = () =>
-    run(async (ctx) => {
-      return (await ctx.run("echo", ["Hello world!"])).stdout;
+    run(async (exe) => {
+      return (await exe.run("echo", ["Hello world!"])).stdout;
     });
   return (
     <div>

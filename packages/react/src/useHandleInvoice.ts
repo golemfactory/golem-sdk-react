@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useConfig } from "./useConfig";
-import { InvoiceProcessor } from "@golem-sdk/golem-js";
+import { GolemNetwork, NullStorageProvider } from "@golem-sdk/golem-js";
 
 interface Options {
   onAccepted?: () => void;
@@ -53,10 +53,16 @@ export function useHandleInvoice(
     reset();
     setIsLoading(true);
     try {
-      const invoiceProcessor = await InvoiceProcessor.create({
-        apiKey,
-        basePath,
+      const glm = new GolemNetwork({
+        api: {
+          key: apiKey,
+          url: basePath,
+        },
+        // no need to initialize any storage provider
+        dataTransferProtocol: new NullStorageProvider(),
       });
+      await glm.connect();
+      const invoiceProcessor = glm.payment.createInvoiceProcessor();
       const invoiceDetails = await invoiceProcessor.fetchSingleInvoice(invoice);
       await invoiceProcessor.acceptInvoice({
         invoice: invoiceDetails,
