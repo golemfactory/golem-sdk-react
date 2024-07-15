@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fontsource/kanit": "^5.0.18",
+    "@golem-sdk/golem-js": "^3.0.0",
     "decimal.js": "^10.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

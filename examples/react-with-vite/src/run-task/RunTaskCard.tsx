@@ -1,52 +1,136 @@
-import { ExecutorOptions, useExecutor } from "@golem-sdk/react";
+import {
+  TaskExecutorOptions,
+  useAllocation,
+  useExecutor,
+} from "@golem-sdk/react";
 import ImageClassification from "./ImageClassification";
 import { useState } from "react";
 import ExecutorOptionsForm from "./ExecutorConfigForm";
+import AllocationForm, { SelectedAllocationType } from "./AllocationForm";
+import { Allocation } from "@golem-sdk/golem-js";
 
 export default function RunTaskCard() {
-  const [executorOptions, setExecutorOptions] = useState<ExecutorOptions>({
-    package: "golem/example-image-classifier:latest",
-    enableLogging: false,
-    budget: 1,
-    subnetTag: "public",
+  const [allocationType, setAllocationType] = useState<SelectedAllocationType>({
+    type: "auto",
+  });
+
+  const [executorOptions, setExecutorOptions] = useState<TaskExecutorOptions>({
+    demand: {
+      workload: {
+        imageTag: "golem/example-image-classifier:latest",
+        minCpuCores: 2,
+        minMemGib: 4,
+        minCpuThreads: 2,
+        minStorageGib: 8,
+      },
+      subnetTag: "public",
+    },
+    market: {
+      rentHours: 0.5,
+      pricing: {
+        model: "linear",
+        maxStartPrice: 0.5,
+        maxCpuPerHourPrice: 1.0,
+        maxEnvPerHourPrice: 0.5,
+      },
+    },
     payment: {
-      driver: "erc20",
       network: "holesky",
     },
-    minCpuCores: 1,
-    minMemGib: 1,
-    minCpuThreads: 1,
-    minStorageGib: 1,
+    enableLogging: false,
+    task: {
+      maxParallelTasks: 1,
+    },
   });
 
   const {
     executor,
     initialize,
-    error,
+    error: taskExecutorError,
     isInitialized,
     isInitializing,
     terminate,
     isTerminating,
-  } = useExecutor(executorOptions);
+  } = useExecutor();
+
+  const {
+    create,
+    load,
+    error: allocationError,
+    isLoading: isAllocationLoading,
+    resetHook: resetAllocationHook,
+  } = useAllocation();
+
+  const initializeExecutorWithAllocation = async () => {
+    if (isInitializing || isInitialized || isAllocationLoading) {
+      return;
+    }
+    resetAllocationHook();
+    if (allocationType.type === "auto") {
+      await initialize(executorOptions);
+      return;
+    }
+    if (allocationType.type === "new") {
+      const { success, allocation } = await create({
+        budget: allocationType.budget,
+        expirationSec: allocationType.expiration,
+      });
+      if (!success) {
+        return;
+      }
+      await initialize({
+        ...executorOptions,
+        payment: {
+          ...executorOptions.payment,
+          allocation: allocation as Allocation | undefined, // TODO: Fix typings in TE
+        },
+      });
+    }
+    if (allocationType.type === "load") {
+      const { success, allocation } = await load(allocationType.id);
+      if (!success) {
+        return;
+      }
+      await initialize({
+        ...executorOptions,
+        payment: {
+          ...executorOptions.payment,
+          allocation: allocation as Allocation | undefined, // TODO: Fix typings in TE
+        },
+      });
+    }
+  };
 
   return (
-    <div className="card bg-base-100 shadow-xl">
+    <div className="card bg-base-100 shadow-xl max-w-4xl">
       <div className="card-body justify-between">
         {!isInitialized && (
           <>
-            <h2 className="card-title">Let's initialize a new Task Executor</h2>
-            <ExecutorOptionsForm
-              options={executorOptions}
-              setOptions={setExecutorOptions}
-              disabled={isInitializing}
-            />
+            <div className="flex flex-row gap-4">
+              <div>
+                <h2 className="card-title">
+                  What kind of machine do you need?
+                </h2>
+                <ExecutorOptionsForm
+                  options={executorOptions}
+                  setOptions={setExecutorOptions}
+                  disabled={isInitializing || isAllocationLoading}
+                />
+              </div>
+              <div>
+                <h2 className="card-title">How do you want to pay?</h2>
+                <AllocationForm
+                  value={allocationType}
+                  onChange={setAllocationType}
+                  disabled={isInitializing || isAllocationLoading}
+                />
+              </div>
+            </div>
             <div className="card-actions justify-end pt-4">
               <button
-                onClick={() => {
-                  initialize();
-                }}
+                onClick={initializeExecutorWithAllocation}
                 className="btn btn-primary"
-                disabled={isInitializing}
+                disabled={isInitializing || isAllocationLoading}
               >
                 {isInitializing ? "Initializing..." : "Initialize"}
               </button>
@@ -54,8 +138,10 @@ export default function RunTaskCard() {
           </>
         )}
 
-        {!!error && (
-          <p className="text-red-500">Something went wrong when initializing</p>
+        {(!!taskExecutorError || !!allocationError) && (
+          <p className="text-red-500">
+            {taskExecutorError?.message || allocationError?.message}
+          </p>
         )}
 
         {isInitialized && executor && (

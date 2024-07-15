@@ -4,6 +4,59 @@ import RunTaskCard from "./run-task/RunTaskCard";
 import { useYagna } from "@golem-sdk/react";
 import ConnectToYagna from "./connection/ConnectToYagna";
 import InvoicesTab from "./invoices/InvoicesTab";
+import { TaskExecutor } from "@golem-sdk/task-executor";
+
+function DEBUGTE({ appkey }: { appkey: string }) {
+  const consoleLogger = {
+    debug: console.debug,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+    child: () => consoleLogger,
+  };
+
+  async function run() {
+    const executor = await TaskExecutor.create({
+      demand: {
+        workload: {
+          imageTag: "golem/alpine:latest",
+        },
+      },
+      market: {
+        rentHours: 0.5,
+        pricing: {
+          model: "linear",
+          maxStartPrice: 0.5,
+          maxCpuPerHourPrice: 1.0,
+          maxEnvPerHourPrice: 0.5,
+        },
+      },
+      api: {
+        key: appkey,
+      },
+      logger: consoleLogger,
+    });
+
+    try {
+      const results = await executor.run(async (exe) => {
+        const res1 = await exe.run('echo "Hello"');
+        const res2 = await exe.run('echo "World"');
+        return `${res1.stdout}${res2.stdout}`;
+      });
+      console.log(results);
+    } catch (err) {
+      console.error("An error occurred during execution:", err);
+    } finally {
+      await executor.shutdown();
+    }
+  }
+
+  return (
+    <button className="btn btn-primary absolute top-4 left-4" onClick={run}>
+      DEBUG in console
+    </button>
+  );
+}
 
 function Tab({
   visible,
@@ -37,7 +90,7 @@ function App() {
     _setActiveTab(tab);
   };
 
-  const { isConnected } = useYagna();
+  const { isConnected, appKey } = useYagna();
 
   return (
     <>
@@ -53,6 +106,7 @@ function App() {
             <Tab visible={activeTab === "invoices"}>
               <InvoicesTab />
             </Tab>
+            <DEBUGTE appkey={appKey!} />
           </>
         )}
       </main>

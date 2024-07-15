@@ -71,7 +71,7 @@ export default function InvoiceTableRow({
       <td>
         <button
           onClick={acceptInvoice}
-          disabled={status !== InvoiceStatus.Received || isAccepted}
+          disabled={status !== "RECEIVED" || isAccepted}
           className="btn btn-primary btn-sm"
         >
           {isLoading ? (
