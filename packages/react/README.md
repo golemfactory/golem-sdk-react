@@ -2,15 +2,12 @@
 
 A collection of React hooks for interacting with the Golem Network.
 
-## Getting started
+## Installation
 
-To add the SDK to your existing react project just install it using your favorite package manager:
+Get started by installing the core package and it's peer dependencies:
 
 ```
-npm install @golem-sdk/react
-yarn add @golem-sdk/react
-pnpm add @golem-sdk/react
-bun add @golem-sdk/react
+npm install @golem-sdk/react @golem-sdk/task-executor@2 @golem-sdk/golem-js@3
 ```
 
 Then make sure to wrap your app with the `YagnaProvider` component:
@@ -101,7 +98,20 @@ function MyComponent() {
     isInitializing,
     terminate,
     error,
-  } = useExecutor();
+  } = useExecutor({
+    demand: {
+      workload: { imageTag: "golem/alpine:latest" },
+    },
+    market: {
+      rentHours: 0.5,
+      pricing: {
+        model: "linear",
+        maxStartPrice: 0.5,
+        maxCpuPerHourPrice: 1.0,
+        maxEnvPerHourPrice: 0.5,
+      },
+    },
+  });
   if (isInitializing) {
     return <div>Initializing executor...</div>;
   }
