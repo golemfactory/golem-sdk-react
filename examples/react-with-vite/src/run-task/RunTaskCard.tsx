@@ -1,13 +1,15 @@
-import {
-  TaskExecutorOptions,
-  useAllocation,
-  useExecutor,
-} from "@golem-sdk/react";
+import { useAllocation, useExecutor } from "@golem-sdk/react";
 import ImageClassification from "./ImageClassification";
 import { useState } from "react";
 import ExecutorOptionsForm from "./ExecutorConfigForm";
 import AllocationForm, { SelectedAllocationType } from "./AllocationForm";
-import { Allocation } from "@golem-sdk/golem-js";
+import { TaskExecutorOptions } from "@golem-sdk/task-executor";
+
+function getPaymentPlatform(network: string) {
+  const mainnets = ["mainnet", "polygon"];
+  const token = mainnets.includes(network) ? "glm" : "tglm";
+  return `erc20-${network}-${token}`;
+}
 
 export default function RunTaskCard() {
   const [allocationType, setAllocationType] = useState<SelectedAllocationType>({
@@ -74,6 +76,9 @@ export default function RunTaskCard() {
       const { success, allocation } = await create({
         budget: allocationType.budget,
         expirationSec: allocationType.expiration,
+        paymentPlatform: getPaymentPlatform(
+          executorOptions.payment?.network || "holesky",
+        ),
       });
       if (!success) {
         return;
@@ -82,7 +87,7 @@ export default function RunTaskCard() {
         ...executorOptions,
         payment: {
           ...executorOptions.payment,
-          allocation: allocation as Allocation | undefined, // TODO: Fix typings in TE
+          allocation,
         },
       });
     }
@@ -95,7 +100,7 @@ export default function RunTaskCard() {
         ...executorOptions,
         payment: {
           ...executorOptions.payment,
-          allocation: allocation as Allocation | undefined, // TODO: Fix typings in TE
+          allocation,
         },
       });
     }

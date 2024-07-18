@@ -1,11 +1,7 @@
 export { YagnaProvider } from "./provider";
 export { useYagna } from "./useYagna";
-export {
-  useExecutor,
-  TaskExecutor,
-  type TaskExecutorOptions,
-} from "./useExecutor";
-export { useTask, type TaskFunction } from "./useTask";
+export { useExecutor } from "./useExecutor";
+export { useTask } from "./useTask";
 export {
   useInvoices,
   type InvoiceStatus,

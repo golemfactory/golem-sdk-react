@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useConfig } from "./useConfig";
-import { GolemNetwork, NullStorageProvider } from "@golem-sdk/golem-js";
+import { withGlm } from "./helpers";
 
 interface Options {
   onAccepted?: () => void;
@@ -43,42 +43,29 @@ export function useHandleInvoice(
     if (isLoading) {
       return;
     }
-    const apiKey = yagnaOptions.apiKey;
-    const basePath = yagnaOptions.basePath;
-    if (!apiKey) {
-      throw new Error(
-        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
-      );
-    }
     reset();
     setIsLoading(true);
-    try {
-      const glm = new GolemNetwork({
-        api: {
-          key: apiKey,
-          url: basePath,
-        },
-        // no need to initialize any storage provider
-        dataTransferProtocol: new NullStorageProvider(),
-      });
-      await glm.connect();
-      const invoiceProcessor = glm.payment.createInvoiceProcessor();
-      const invoiceDetails = await invoiceProcessor.fetchSingleInvoice(invoice);
-      await invoiceProcessor.acceptInvoice({
-        invoice: invoiceDetails,
-      });
-      setIsAccepted(true);
-      onAccepted?.();
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error(JSON.stringify(err)));
+    return withGlm(yagnaOptions, async (glm) => {
+      try {
+        const invoiceProcessor = glm.payment.createInvoiceProcessor();
+        const invoiceDetails =
+          await invoiceProcessor.fetchSingleInvoice(invoice);
+        await invoiceProcessor.acceptInvoice({
+          invoice: invoiceDetails,
+        });
+        setIsAccepted(true);
+        onAccepted?.();
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error(JSON.stringify(err)));
+        }
+        onRejected?.();
+      } finally {
+        setIsLoading(false);
       }
-      onRejected?.();
-    } finally {
-      setIsLoading(false);
-    }
+    });
   }, [invoice, isLoading, onAccepted, onRejected, reset, yagnaOptions]);
 
   return {

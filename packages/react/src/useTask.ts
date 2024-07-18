@@ -1,11 +1,5 @@
-import { TaskExecutor } from "@golem-sdk/task-executor";
+import { TaskExecutor, TaskFunction } from "@golem-sdk/task-executor";
 import { useCallback, useState } from "react";
-
-// TODO: expose worker type in @golem-sdk/golem-js
-// Import for use in the hook
-import { TaskFunction } from "@golem-sdk/task-executor/dist/task";
-// Export for use by SDK users
-export type { TaskFunction };
 
 /**
  * A hook for managing a single task on the Golem network. To execute a task, call the `run` function with a worker function as an argument.

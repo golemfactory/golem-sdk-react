@@ -1,4 +1,4 @@
-import { TaskExecutorOptions } from "@golem-sdk/react";
+import { TaskExecutorOptions } from "@golem-sdk/task-executor";
 
 type ExecutorOptionsFormProps = {
   disabled: boolean;

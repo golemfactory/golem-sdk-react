@@ -1,6 +1,6 @@
 import useSwr, { SWRConfiguration } from "swr";
 import { useConfig } from "./useConfig";
-import { GolemNetwork, NullStorageProvider } from "@golem-sdk/golem-js";
+import { withGlm } from "./helpers";
 
 export type InvoiceStatus =
   | "ISSUED"
@@ -70,30 +70,17 @@ export function useInvoices({
   const { data, isLoading, isValidating, error, mutate } = useSwr(
     [swrKey, "invoices", searchParameters, yagnaOptions],
     async () => {
-      const apiKey = yagnaOptions.apiKey;
-      const basePath = yagnaOptions.basePath;
-      if (!apiKey) {
-        throw new Error(
-          "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
-        );
-      }
-      const glm = new GolemNetwork({
-        api: {
-          key: apiKey,
-          url: basePath,
-        },
-        dataTransferProtocol: new NullStorageProvider(),
+      return withGlm(yagnaOptions, async (glm) => {
+        const invoiceProcessor = glm.payment.createInvoiceProcessor();
+        if (searchParameters.invoiceIds) {
+          return Promise.all(
+            searchParameters.invoiceIds.map((id) =>
+              invoiceProcessor.fetchSingleInvoice(id),
+            ),
+          );
+        }
+        return invoiceProcessor.collectInvoices(searchParameters);
       });
-      await glm.connect();
-      const invoiceProcessor = glm.payment.createInvoiceProcessor();
-      if (searchParameters.invoiceIds) {
-        return Promise.all(
-          searchParameters.invoiceIds.map((id) =>
-            invoiceProcessor.fetchSingleInvoice(id),
-          ),
-        );
-      }
-      return invoiceProcessor.collectInvoices(searchParameters);
     },
     {
       keepPreviousData: true,

@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@fontsource/kanit": "^5.0.18",
-    "@golem-sdk/golem-js": "^3.0.0",
+    "@golem-sdk/golem-js": "^3.1.0",
+    "@golem-sdk/task-executor": "^2.0.0-beta.1",
     "decimal.js": "^10.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

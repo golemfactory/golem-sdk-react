@@ -1,6 +1,12 @@
 import { GolemNetwork, NullStorageProvider } from "@golem-sdk/golem-js";
 import { YagnaContext } from "./provider";
 
+/**
+ * Create a temporary connection to the Golem Network and execute a callback.
+ * NOTE: the provided GolemNetwork instance will **not** `connect()` automatically.
+ *
+ * For internal use only.
+ */
 export async function withGlm<T>(
   yagnaOptions: YagnaContext["yagnaOptions"],
   cb: (glm: GolemNetwork) => T | Promise<T>,
@@ -20,7 +26,6 @@ export async function withGlm<T>(
     dataTransferProtocol: new NullStorageProvider(),
   });
 
-  await glm.connect();
   try {
     return cb(glm);
   } finally {

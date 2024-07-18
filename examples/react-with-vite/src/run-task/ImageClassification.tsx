@@ -1,12 +1,16 @@
-import { TaskExecutor } from "@golem-sdk/task-executor";
-import { TaskFunction, useTask } from "@golem-sdk/react";
+import { TaskExecutor, type TaskFunction } from "@golem-sdk/task-executor";
+import { useTask } from "@golem-sdk/react";
 import Decimal from "decimal.js";
 import { useState } from "react";
-import { ExeUnit } from "@golem-sdk/golem-js";
+
+type ClassificationResult = {
+  className: string;
+  probability: number;
+};
 
 function isResultDefinedAndValid(
   result: unknown,
-): result is { className: string; probability: number } {
+): result is ClassificationResult {
   return (
     typeof result === "object" &&
     result !== null &&
@@ -32,14 +36,14 @@ function readFile(file: File): Promise<Uint8Array> {
 
 async function classifyOnGolem(
   image: File,
-  runFunction: (fn: TaskFunction) => Promise<void>,
+  runFunction: (fn: TaskFunction<ClassificationResult>) => Promise<void>,
 ) {
   const extension = image.name.split(".").pop();
   const input = `/golem/input/img.${extension}`;
   const output = `/golem/output/out.json`;
   const imageData = await readFile(image);
 
-  await runFunction(async (exe: ExeUnit) => {
+  await runFunction(async (exe) => {
     console.log("Uploading data...");
     await exe.uploadData(imageData, input);
     console.log("Running the task...");

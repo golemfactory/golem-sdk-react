@@ -1,9 +1,9 @@
-import { TaskExecutorOptions, TaskExecutor } from "@golem-sdk/task-executor";
+import {
+  type TaskExecutorOptions,
+  TaskExecutor,
+} from "@golem-sdk/task-executor";
 import { useConfig } from "./useConfig";
 import { useCallback, useState } from "react";
-
-export { TaskExecutor };
-export type { TaskExecutorOptions };
 
 function beforeUnloadHandler(e: BeforeUnloadEvent) {
   e.preventDefault();
@@ -74,6 +74,9 @@ export function useExecutor(
         }
         const optionsToUse = (overrideOptions ||
           options) as TaskExecutorOptions;
+
+        console.log("optionsToUse", optionsToUse);
+
         const executor = await TaskExecutor.create({
           api: {
             key: config.yagnaOptions.apiKey,
