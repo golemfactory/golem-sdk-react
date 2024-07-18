@@ -75,8 +75,6 @@ export function useExecutor(
         const optionsToUse = (overrideOptions ||
           options) as TaskExecutorOptions;
 
-        console.log("optionsToUse", optionsToUse);
-
         const executor = await TaskExecutor.create({
           api: {
             key: config.yagnaOptions.apiKey,
