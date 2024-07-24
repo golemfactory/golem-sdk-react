@@ -1,9 +1,9 @@
-import { ExecutorOptions, TaskExecutor } from "@golem-sdk/task-executor";
+import {
+  type TaskExecutorOptions,
+  TaskExecutor,
+} from "@golem-sdk/task-executor";
 import { useConfig } from "./useConfig";
 import { useCallback, useState } from "react";
-
-export { TaskExecutor };
-export type { ExecutorOptions };
 
 function beforeUnloadHandler(e: BeforeUnloadEvent) {
   e.preventDefault();
@@ -22,6 +22,14 @@ interface ExtraOptions {
   addBeforeUnloadHandler?: boolean;
 }
 
+const consoleLogger = {
+  debug: console.debug,
+  info: console.info,
+  warn: console.warn,
+  error: console.error,
+  child: () => consoleLogger,
+};
+
 /**
  * A hook that provides a task executor instance and related state.
  *
@@ -32,7 +40,7 @@ interface ExtraOptions {
  * @returns An object containing the task executor instance, initialization and termination functions, and related state.
  */
 export function useExecutor(
-  options: ExecutorOptions,
+  options?: TaskExecutorOptions,
   { addBeforeUnloadHandler = true }: ExtraOptions = {},
 ) {
   const [executor, setExecutor] = useState<TaskExecutor | null>(null);
@@ -42,43 +50,55 @@ export function useExecutor(
   const config = useConfig();
   const isInitialized = !!executor;
 
-  const initialize = useCallback(async () => {
-    if (isInitialized || isInitializing) {
-      throw new Error("Executor is already initialized");
-    }
-    if (!config.yagnaOptions.apiKey) {
-      throw new Error(
-        "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
-      );
-    }
-
-    setIsInitializing(true);
-
-    try {
-      if (addBeforeUnloadHandler) {
-        registerBeforeUnloadHandler();
+  const initialize = useCallback(
+    async (overrideOptions?: TaskExecutorOptions) => {
+      if (isInitialized || isInitializing) {
+        throw new Error("Executor is already initialized");
       }
-      const executor = await TaskExecutor.create({
-        yagnaOptions: {
-          apiKey: config.yagnaOptions.apiKey,
-          basePath: config.yagnaOptions.basePath,
-        },
-        enableLogging: false,
-        ...options,
-      });
-      setExecutor(executor);
-      setError(undefined);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error(JSON.stringify(err)));
+      if (!config.yagnaOptions.apiKey) {
+        throw new Error(
+          "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
+        );
       }
-      removeBeforeUnloadHandler();
-    } finally {
-      setIsInitializing(false);
-    }
-  }, [config.yagnaOptions.apiKey, config.yagnaOptions.basePath, options]);
+      if (!options && !overrideOptions) {
+        throw new Error(
+          "Options must be provided, either as a hook parameter or an argument to `initialize`",
+        );
+      }
+
+      setIsInitializing(true);
+
+      try {
+        if (addBeforeUnloadHandler) {
+          registerBeforeUnloadHandler();
+        }
+        const optionsToUse = (overrideOptions ||
+          options) as TaskExecutorOptions;
+
+        const executor = await TaskExecutor.create({
+          api: {
+            key: config.yagnaOptions.apiKey,
+            url: config.yagnaOptions.basePath,
+          },
+          logger: consoleLogger,
+          enableLogging: false,
+          ...optionsToUse,
+        });
+        setExecutor(executor);
+        setError(undefined);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error(JSON.stringify(err)));
+        }
+        removeBeforeUnloadHandler();
+      } finally {
+        setIsInitializing(false);
+      }
+    },
+    [config.yagnaOptions.apiKey, config.yagnaOptions.basePath, options],
+  );
 
   const terminate = useCallback(async () => {
     removeBeforeUnloadHandler();

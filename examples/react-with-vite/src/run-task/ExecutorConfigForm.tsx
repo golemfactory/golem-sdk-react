@@ -1,9 +1,9 @@
-import { ExecutorOptions } from "@golem-sdk/react";
+import { TaskExecutorOptions } from "@golem-sdk/task-executor";
 
 type ExecutorOptionsFormProps = {
   disabled: boolean;
-  options: ExecutorOptions;
-  setOptions: (config: ExecutorOptions) => void;
+  options: TaskExecutorOptions;
+  setOptions: (config: TaskExecutorOptions) => void;
 };
 
 export default function ExecutorOptionsForm({
@@ -13,7 +13,7 @@ export default function ExecutorOptionsForm({
 }: ExecutorOptionsFormProps) {
   return (
     <form>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-row gap-4">
         <div className="form-control">
           <label className="label">
             <span className="label-text">Subnet</span>
@@ -23,11 +23,14 @@ export default function ExecutorOptionsForm({
             type="text"
             placeholder="Type here"
             className="input input-bordered w-full max-w-xs"
-            value={options.subnetTag}
+            value={options.demand.subnetTag}
             onChange={(e) => {
               setOptions({
                 ...options,
-                subnetTag: e.target.value,
+                demand: {
+                  ...options.demand,
+                  subnetTag: e.target.value,
+                },
               });
             }}
           />
@@ -54,119 +57,150 @@ export default function ExecutorOptionsForm({
           />
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-4 max-w-2xl  whitespace-nowrap">
+      <div className="flex flex-col gap-1">
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Min CPU cores</span>
+            <span className="label-text">CPU cores (minimum)</span>
           </label>
           <input
+            type="range"
             disabled={disabled}
-            type="number"
-            step="0.1"
-            placeholder="0.00"
-            className="input input-bordered w-full max-w-xs"
-            value={options.minCpuCores}
+            min={1}
+            max={16}
+            value={options.demand.workload?.minCpuCores}
             onChange={(e) => {
               setOptions({
                 ...options,
-                minCpuCores: parseFloat(e.target.value),
+                demand: {
+                  ...options.demand,
+                  workload: {
+                    ...options.demand.workload,
+                    minCpuCores: parseInt(e.target.value),
+                  },
+                },
               });
             }}
+            className="range range-primary"
+            step={1}
           />
+          <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] text-xs place-items-center">
+            {Array.from({ length: 16 }, (_, i) => (
+              <span key={"option" + i}>{i + 1}</span>
+            ))}
+          </div>
         </div>
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Min CPU threads</span>
+            <span className="label-text">CPU threads (minimum)</span>
           </label>
           <input
+            type="range"
             disabled={disabled}
-            type="number"
-            step="0.1"
-            placeholder="0.00"
-            className="input input-bordered w-full max-w-xs"
-            value={options.minCpuThreads}
+            min={1}
+            max={16}
+            value={options.demand.workload?.minCpuThreads}
             onChange={(e) => {
               setOptions({
                 ...options,
-                minCpuThreads: parseFloat(e.target.value),
+                demand: {
+                  ...options.demand,
+                  workload: {
+                    ...options.demand.workload,
+                    minCpuThreads: parseInt(e.target.value),
+                  },
+                },
               });
             }}
+            className="range range-primary"
+            step={1}
           />
+          <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] text-xs place-items-center">
+            {Array.from({ length: 16 }, (_, i) => (
+              <span key={"option" + i}>{i + 1}</span>
+            ))}
+          </div>
         </div>
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Min mem (GiB)</span>
+            <span className="label-text">Gigabytes of RAM (minimum)</span>
           </label>
           <input
+            type="range"
             disabled={disabled}
-            type="number"
-            step="0.1"
-            placeholder="0.00"
-            className="input input-bordered w-full max-w-xs"
-            value={options.minMemGib}
+            min={1}
+            max={16}
+            value={options.demand.workload?.minMemGib}
             onChange={(e) => {
               setOptions({
                 ...options,
-                minMemGib: parseFloat(e.target.value),
+                demand: {
+                  ...options.demand,
+                  workload: {
+                    ...options.demand.workload,
+                    minMemGib: parseInt(e.target.value),
+                  },
+                },
               });
             }}
+            className="range range-primary"
+            step={1}
           />
+          <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] text-xs place-items-center">
+            {Array.from({ length: 16 }, (_, i) => (
+              <span key={"option" + i}>{i + 1}</span>
+            ))}
+          </div>
         </div>
         <div className="form-control">
           <label className="label">
             <span className="label-text">Min storage (GiB)</span>
           </label>
           <input
+            type="range"
             disabled={disabled}
-            type="number"
-            step="0.1"
-            placeholder="0.00"
-            className="input input-bordered w-full max-w-xs"
-            value={options.minStorageGib}
+            min={2}
+            max={32}
+            value={options.demand.workload?.minStorageGib}
             onChange={(e) => {
               setOptions({
                 ...options,
-                minStorageGib: parseFloat(e.target.value),
+                demand: {
+                  ...options.demand,
+                  workload: {
+                    ...options.demand.workload,
+                    minStorageGib: parseInt(e.target.value),
+                  },
+                },
               });
             }}
+            className="range range-primary"
+            step={2}
           />
+          <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] text-xs place-items-center">
+            {Array.from({ length: 16 }, (_, i) => (
+              <span key={"option" + i}>{2 * (i + 1)}</span>
+            ))}
+          </div>
         </div>
         <div className="form-control">
-          <label className="label">
-            <span className="label-text">Budget (GLM)</span>
+          <label className="label cursor-pointer justify-start gap-4">
+            <span className="label-text">
+              Enable logging to the browser console
+            </span>
+            <input
+              type="checkbox"
+              disabled={disabled}
+              className="toggle"
+              checked={options.enableLogging}
+              onChange={(e) => {
+                setOptions({
+                  ...options,
+                  enableLogging: e.target.checked,
+                });
+              }}
+            />
           </label>
-          <input
-            disabled={disabled}
-            type="number"
-            step="0.1"
-            placeholder="0.00"
-            className="input input-bordered w-full max-w-xs"
-            value={options.budget}
-            onChange={(e) => {
-              setOptions({
-                ...options,
-                budget: parseFloat(e.target.value),
-              });
-            }}
-          />
         </div>
-      </div>
-      <div className="form-control">
-        <label className="label cursor-pointer justify-start gap-4">
-          <span className="label-text">Debug (log to browser console)</span>
-          <input
-            disabled={disabled}
-            type="checkbox"
-            className="toggle"
-            checked={options.enableLogging}
-            onChange={(e) => {
-              setOptions({
-                ...options,
-                enableLogging: e.target.checked,
-              });
-            }}
-          />
-        </label>
       </div>
     </form>
   );

@@ -1,10 +1,15 @@
 import useSwr, { SWRConfiguration } from "swr";
 import { useConfig } from "./useConfig";
-import { yaPayment } from "ya-ts-client";
-import { InvoiceProcessor } from "@golem-sdk/golem-js";
+import { withGlm } from "./helpers";
 
-export const InvoiceStatus = yaPayment.InvoiceStatus;
-export type InvoiceStatus = yaPayment.InvoiceStatus;
+export type InvoiceStatus =
+  | "ISSUED"
+  | "RECEIVED"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "FAILED"
+  | "SETTLED"
+  | "CANCELLED";
 
 export type InvoiceSearchParameters = {
   after?: Date;
@@ -65,25 +70,17 @@ export function useInvoices({
   const { data, isLoading, isValidating, error, mutate } = useSwr(
     [swrKey, "invoices", searchParameters, yagnaOptions],
     async () => {
-      const apiKey = yagnaOptions.apiKey;
-      const basePath = yagnaOptions.basePath;
-      if (!apiKey) {
-        throw new Error(
-          "Connection to Yagna is not established, use `useYagna` hook to set the app key and connect.",
-        );
-      }
-      const invoiceProcessor = await InvoiceProcessor.create({
-        apiKey,
-        basePath,
+      return withGlm(yagnaOptions, async (glm) => {
+        const invoiceProcessor = glm.payment.createInvoiceProcessor();
+        if (searchParameters.invoiceIds) {
+          return Promise.all(
+            searchParameters.invoiceIds.map((id) =>
+              invoiceProcessor.fetchSingleInvoice(id),
+            ),
+          );
+        }
+        return invoiceProcessor.collectInvoices(searchParameters);
       });
-      if (searchParameters.invoiceIds) {
-        return Promise.all(
-          searchParameters.invoiceIds.map((id) =>
-            invoiceProcessor.fetchSingleInvoice(id),
-          ),
-        );
-      }
-      return invoiceProcessor.collectInvoices(searchParameters);
     },
     {
       keepPreviousData: true,

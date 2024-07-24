@@ -1,9 +1,9 @@
 import React, { createContext, PropsWithChildren } from "react";
-import { Yagna } from "@golem-sdk/golem-js";
+import { YagnaApi } from "@golem-sdk/golem-js";
 
 export interface YagnaContext {
   yagnaOptions: {
-    client?: Yagna;
+    client?: YagnaApi;
     apiKey: string | null;
     basePath: string;
   };
@@ -49,7 +49,7 @@ export function YagnaProvider({
       apiKey: config?.yagnaAppKey || null,
       basePath: config?.yagnaUrl || "http://127.0.0.1:7465",
       client: config?.yagnaAppKey
-        ? new Yagna({
+        ? new YagnaApi({
             apiKey: config?.yagnaAppKey,
             basePath: config?.yagnaUrl || "http://127.0.0.1:7465",
           })
@@ -58,7 +58,7 @@ export function YagnaProvider({
     setYagnaOptions: (options) => {
       setOptions((prev) => {
         const newClient = options.apiKey
-          ? new Yagna({
+          ? new YagnaApi({
               apiKey: options.apiKey,
               basePath: options.basePath || prev.yagnaOptions.basePath,
             })

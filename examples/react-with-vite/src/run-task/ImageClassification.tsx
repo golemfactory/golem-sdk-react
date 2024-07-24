@@ -1,11 +1,16 @@
-import { TaskExecutor } from "@golem-sdk/task-executor";
-import { Worker, useTask } from "@golem-sdk/react";
+import { TaskExecutor, type TaskFunction } from "@golem-sdk/task-executor";
+import { useTask } from "@golem-sdk/react";
 import Decimal from "decimal.js";
 import { useState } from "react";
 
+type ClassificationResult = {
+  className: string;
+  probability: number;
+};
+
 function isResultDefinedAndValid(
   result: unknown,
-): result is { className: string; probability: number } {
+): result is ClassificationResult {
   return (
     typeof result === "object" &&
     result !== null &&
@@ -31,19 +36,20 @@ function readFile(file: File): Promise<Uint8Array> {
 
 async function classifyOnGolem(
   image: File,
-  runFunction: (
-    ctx: Worker<{ className: string; probability: number }>,
-  ) => Promise<void>,
+  runFunction: (fn: TaskFunction<ClassificationResult>) => Promise<void>,
 ) {
   const extension = image.name.split(".").pop();
   const input = `/golem/input/img.${extension}`;
   const output = `/golem/output/out.json`;
   const imageData = await readFile(image);
 
-  await runFunction(async (ctx) => {
-    await ctx.uploadData(imageData, input);
-    await ctx.run(`node index.js ${input} ${output}`);
-    const result = await ctx.downloadData(output);
+  await runFunction(async (exe) => {
+    console.log("Uploading data...");
+    await exe.uploadData(imageData, input);
+    console.log("Running the task...");
+    await exe.run(`node index.js ${input} ${output}`);
+    console.log("Downloading the result...");
+    const result = await exe.downloadData(output);
     const decoder = new TextDecoder();
     return JSON.parse(decoder.decode(result.data));
   });

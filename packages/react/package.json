@@ -17,11 +17,11 @@
     }
   },
   "dependencies": {
-    "@golem-sdk/golem-js": "^2.2.0",
-    "@golem-sdk/task-executor": "^1.0.1",
     "swr": "^2.2.2"
   },
   "devDependencies": {
+    "@golem-sdk/golem-js": "^3.1.0",
+    "@golem-sdk/task-executor": "^2.0.0",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "react": "^18.2.0",
@@ -29,6 +29,8 @@
     "rimraf": "^5.0.5"
   },
   "peerDependencies": {
+    "@golem-sdk/golem-js": "^3.0.0",
+    "@golem-sdk/task-executor": "^2.0.0",
     "react": "^16.8.0  || ^17.0.0 || ^18.0.0",
     "react-dom": "^16.8.0  || ^17.0.0 || ^18.0.0"
   },

@@ -1,11 +1,5 @@
-import { TaskExecutor } from "@golem-sdk/task-executor";
+import { TaskExecutor, TaskFunction } from "@golem-sdk/task-executor";
 import { useCallback, useState } from "react";
-
-// TODO: expose worker type in @golem-sdk/golem-js
-// Import for use in the hook
-import { Worker } from "@golem-sdk/golem-js/dist/task";
-// Export for use by SDK users
-export type { Worker };
 
 /**
  * A hook for managing a single task on the Golem network. To execute a task, call the `run` function with a worker function as an argument.
@@ -23,8 +17,8 @@ export type { Worker };
  * function MyComponent({ executor }) {
  *   const { isRunning, error, result, run } = useTask(executor);
  *   const onClick = () =>
- *     run(async (ctx) => {
- *       return (await ctx.run("echo", ["Hello world!"])).stdout;
+ *     run(async (exe) => {
+ *       return (await exe.run("echo", ["Hello world!"])).stdout;
  *     });
  *   return (
  *     <div>
@@ -45,7 +39,7 @@ export function useTask<TData = unknown>(executor: TaskExecutor) {
   const [error, setError] = useState<Error>();
 
   const run = useCallback(
-    async (worker: Worker<TData>) => {
+    async (taskFunction: TaskFunction<TData>) => {
       if (isRunning) {
         throw new Error("Task is already running");
       }
@@ -54,7 +48,7 @@ export function useTask<TData = unknown>(executor: TaskExecutor) {
       setResult(undefined);
 
       try {
-        const result = await executor.run<TData>(worker);
+        const result = await executor.run<TData>(taskFunction);
         setResult(result);
       } catch (err) {
         if (err instanceof Error) {

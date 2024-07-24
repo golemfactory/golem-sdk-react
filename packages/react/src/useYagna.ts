@@ -39,7 +39,7 @@ export function useYagna() {
       if (!yagnaOptions.client) {
         throw new Error("Cannot connect to Yagna, provide an app key.");
       }
-      return yagnaOptions.client.getApi().identity.getIdentity();
+      return yagnaOptions.client.identity.getIdentity();
     },
     {
       refreshInterval: 3000, // ping yagna every 3 seconds to check if it's still connected
